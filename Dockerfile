@@ -1,8 +1,8 @@
 # syntax=docker/dockerfile:1.4
 FROM mcr.microsoft.com/dotnet/aspnet:6.0.7-bullseye-slim AS base
 WORKDIR /app
-EXPOSE 8080
-ENV ASPNETCORE_URLS="http://+:8080"
+EXPOSE 8080/tcp 8081/tcp
+ENV ASPNETCORE_URLS="http://+:8080;http://+:8081"
 USER 65532:65532
 CMD ["dotnet", "magniFHIR.dll"]
 
