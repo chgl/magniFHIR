@@ -1,0 +1,20 @@
+@using Hl7.Fhir.Model
+@using magniFHIR.Pages.PatientRecord;
+@using FluentAssertions;
+
+@inherits TestContext
+
+@code
+{
+    [Fact]
+    public void RendersEmptyWithEmptyConditionList()
+    {
+        var cut = RenderComponent<ObservationTable>(parameters => parameters
+        .Add(p => p.Observations, new List<Observation>())
+        );
+
+        var tableRows = cut.FindAll("table > tbody > tr");
+
+        tableRows.Should().BeEmpty();
+    }
+}

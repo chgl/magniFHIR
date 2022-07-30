@@ -1,0 +1,11 @@
+﻿@page "/"
+@inject NavigationManager NavManager
+
+<PageTitle>Index</PageTitle>
+
+@code {
+    protected override void OnParametersSet()
+    {
+        NavManager.NavigateTo("/servers");
+    }
+}

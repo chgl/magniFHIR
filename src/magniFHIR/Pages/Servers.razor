@@ -1,0 +1,39 @@
+@page "/servers/{fhirServerNameSlug?}"
+@inject NavigationManager NavManager
+@inject FhirServersOptions ServerOptions
+
+<PageTitle>Index</PageTitle>
+
+<MudText Typo="Typo.h3" GutterBottom="true">Connected to @FhirServerNameSlug</MudText>
+<MudText Typo="Typo.subtitle1">Base URL: @connectedFhirServer?.BaseUrl</MudText>
+
+<MudPaper Class="py-3" Elevation="0">
+    <MudNavMenu>
+        <MudText Typo="Typo.h6" Class="ml-7">Available FHIR Servers</MudText>
+        <MudDivider Class="my-2" />
+        @foreach (var server in ServerOptions.FhirServers)
+        {
+            <MudNavLink Href="@($"/servers/{server.NameSlug}")">@server.Name</MudNavLink>
+        }
+    </MudNavMenu>
+</MudPaper>
+
+@code {
+    [Parameter]
+    public string? FhirServerNameSlug { get; set; }
+
+    private FhirServerConfig? connectedFhirServer = null;
+
+    protected override void OnInitialized()
+    {
+        OnParametersSet();
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (FhirServerNameSlug is not null)
+        {
+            connectedFhirServer = ServerOptions.FindByNameSlug(FhirServerNameSlug);
+        }
+    }
+}

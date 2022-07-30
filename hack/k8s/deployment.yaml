@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: magnifhir
+  name: magnifhir
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: magnifhir
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: magnifhir
+    spec:
+      containers:
+        - image: magnifhir
+          name: magnifhir
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            privileged: false
+            runAsGroup: 65532
+            runAsUser: 65532
+            runAsNonRoot: true
+            seccompProfile:
+              type: "RuntimeDefault"
+          resources:
+            requests:
+              memory: 512Mi
+              cpu: 1000m
+            limits:
+              memory: 512Mi
+              cpu: 1000m
+          env:
+            - name: ASPNETCORE_URLS
+              value: "http://+:8080"
+          ports:
+            - containerPort: 8080
+              name: http
+          volumeMounts:
+            - name: magnifhir-appsettings
+              mountPath: /app/appsettings.Production.json
+              readOnly: true
+              subPath: appsettings.Production.json
+      volumes:
+        - name: magnifhir-appsettings
+          configMap:
+            name: magnifhir-appsettings
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: magnifhir
+spec:
+  selector:
+    app.kubernetes.io/name: magnifhir
+  ports:
+    - port: 8080
+      name: http
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: magnifhir-appsettings
+data:
+  appsettings.Production.json: |
+    {
+      "FhirServers": [
+        {
+          "Name": "HAPI FHIR JPA Server",
+          "BaseUrl": "http://hapi-fhir-server.svc/fhir"
+        }
+      ]
+    }

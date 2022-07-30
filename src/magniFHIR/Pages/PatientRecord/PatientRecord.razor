@@ -1,0 +1,69 @@
+@page "/servers/{fhirServerNameSlug}/patients/{patientId?}"
+@using Hl7.Fhir.Model
+@using magniFHIR.Data
+@inject NavigationManager NavigationManager
+@inject FhirService PatientService
+
+<PageTitle>Patient Record</PageTitle>
+
+<MudTextField @bind-Value="SearchedForPatientId" Label="Patient.id or Patient.identifier" Variant="Variant.Outlined"
+    Adornment="Adornment.End" AdornmentIcon="@Icons.Filled.Search" AdornmentColor="Color.Secondary" OnKeyUp="@OnKeyUp"
+    Class="mb-4" />
+
+@if (FoundPatient is not null)
+{
+    <PatientCard Patient="@FoundPatient" />
+}
+
+<MudTabs Outlined="true" Rounded="true" Border="true" ApplyEffectsToContainer="true" Class="mt-8" PanelClass="pa-6">
+    <MudTabPanel Text="Conditions" Icon="@Icons.Filled.Coronavirus">
+        <ConditionTable Conditions="@Conditions" />
+    </MudTabPanel>
+    <MudTabPanel Text="Observations" Icon="@Icons.Filled.Biotech">
+        <ObservationTable Observations="@Observations" />
+    </MudTabPanel>
+    <MudTabPanel Text="Medications" Icon="@Icons.Filled.Medication">
+        <MudAlert Severity="Severity.Info">Coming Soon...</MudAlert>
+    </MudTabPanel>
+</MudTabs>
+
+@code {
+    [Parameter]
+    public string? FhirServerNameSlug { get; set; }
+    [Parameter]
+    public string? PatientId { get; set; }
+    public string? SearchedForPatientId { get; set; }
+    public Patient? FoundPatient { get; set; }
+    public List<Condition>? Conditions { get; set; }
+    public List<Observation>? Observations { get; set; }
+
+    protected async override System.Threading.Tasks.Task OnParametersSetAsync()
+    {
+        SearchedForPatientId = PatientId;
+
+        if (SearchedForPatientId is not null && FhirServerNameSlug is not null)
+        {
+            FoundPatient = await PatientService.GetPatientsByIdAsync(FhirServerNameSlug, SearchedForPatientId);
+
+            Conditions = await PatientService.GetResourcesByPatientIdAsync<Condition>(
+            FhirServerNameSlug,
+            SearchedForPatientId,
+            "recorded-date");
+
+            Observations = await PatientService.GetResourcesByPatientIdAsync<Observation>(
+            FhirServerNameSlug,
+            SearchedForPatientId,
+            "date");
+        }
+    }
+
+    public void OnKeyUp(KeyboardEventArgs e)
+    {
+        var encodedSearchTerm = System.Web.HttpUtility.UrlEncode(SearchedForPatientId);
+
+        if (e.Code == "Enter" || e.Code == "NumpadEnter")
+        {
+            NavigationManager.NavigateTo($"/servers/{FhirServerNameSlug}/patients/{encodedSearchTerm}");
+        }
+    }
+}

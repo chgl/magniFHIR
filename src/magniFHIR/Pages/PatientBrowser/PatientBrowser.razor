@@ -1,0 +1,68 @@
+@page "/servers/{fhirServerNameSlug}/browser"
+@using Hl7.Fhir.Model
+@using magniFHIR.Data
+@inject FhirService PatientService
+@inject NavigationManager NavManager
+
+<PageTitle>Patient Browser</PageTitle>
+
+<MudText Typo="Typo.h3" GutterBottom="true">Patient Browser</MudText>
+
+<MudAlert Severity="Severity.Warning">
+    This browser currently only supports loading a single bundle of Patient resources ordered by their
+    <code>meta.lastUpdated</code> field.
+</MudAlert>
+
+
+@if (patients is null)
+{
+    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+}
+else
+{
+    <MudTable Dense="true" Items="@patients" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
+        <HeaderContent>
+            <MudTh>Name</MudTh>
+            <MudTh>Birth Date</MudTh>
+            <MudTh>Gender</MudTh>
+            <MudTh>MRN</MudTh>
+            <MudTh>Id</MudTh>
+            <MudTh>Last Updated</MudTh>
+            <MudTh>Patient Record</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Name">@context.DisplayName()</MudTd>
+            <MudTd DataLabel="BirthDate">@context.BirthDate</MudTd>
+            <MudTd DataLabel="Gender">@context.Gender</MudTd>
+            <MudTd DataLabel="MRN">@(string.Join(", ", context.MedicalRecordNumbers()))</MudTd>
+            <MudTd DataLabel="Id">@context.Id</MudTd>
+            <MudTd DataLabel="LastUpdated">@context.Meta.LastUpdated</MudTd>
+            <MudTd>
+                <MudButton Size="Size.Small" Variant="Variant.Outlined" Color="Color.Secondary"
+                EndIcon="@Icons.Material.Filled.ContactPage"
+                Href="@($"/servers/{FhirServerNameSlug}/patients/{context.Id}")" Target="_blank">
+                    View Record
+                </MudButton>
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+}
+
+@code {
+    [Parameter]
+    public string? FhirServerNameSlug { get; set; }
+    private List<Patient>? patients;
+    private Exception Error;
+
+    protected override async System.Threading.Tasks.Task OnInitializedAsync()
+    {
+        if (FhirServerNameSlug is null)
+        {
+            throw new InvalidOperationException("Requested patient browser without server name set.");
+        }
+
+        var bundle = await PatientService.GetPatientsAsync(FhirServerNameSlug);
+
+        patients = bundle.Entry.Select(entry => entry.Resource).Cast<Patient>().ToList();
+    }
+}

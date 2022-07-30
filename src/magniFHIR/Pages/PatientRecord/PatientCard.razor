@@ -1,0 +1,55 @@
+@using Hl7.Fhir.Model
+
+<MudCard>
+    <MudCardHeader>
+        <CardHeaderAvatar>
+            <MudAvatar Color="Color.Secondary">
+                <MudIcon Icon="@Icons.Material.Filled.Person" Size="Size.Large" />
+            </MudAvatar>
+        </CardHeaderAvatar>
+        <CardHeaderContent>
+            <MudText Typo="Typo.body1">@Name</MudText>
+            <MudText Typo="Typo.body2">
+                @Patient.Gender
+            </MudText>
+            <MudText Typo="Typo.body2">
+                @BirthDate
+            </MudText>
+        </CardHeaderContent>
+    </MudCardHeader>
+</MudCard>
+
+@code {
+    [Parameter]
+    public Patient Patient { get; set; }
+    public string Name => HumanNamesToDisplayName(this.Patient.Name) ?? this.Patient.Id;
+    public string BirthDate => this.Patient.BirthDate;
+
+    public bool? IsDeceased
+    {
+        get
+        {
+            if (this.Patient.Deceased is FhirBoolean isDeceased)
+            {
+                return isDeceased.Value;
+            }
+
+            if (this.Patient.Deceased is FhirDateTime deceasedTime)
+            {
+                return true;
+            }
+
+            return null;
+        }
+    }
+
+    private static string? HumanNamesToDisplayName(List<HumanName> humanName)
+    {
+        if (humanName is null || humanName.Count == 0)
+        {
+            return null;
+        }
+
+        return null;
+    }
+}

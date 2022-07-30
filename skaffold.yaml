@@ -1,0 +1,16 @@
+apiVersion: skaffold/v2beta29
+kind: Config
+metadata:
+  name: magnifhir
+build:
+  local:
+    useBuildkit: true
+  artifacts:
+    - image: magnifhir
+      context: .
+      docker:
+        dockerfile: Dockerfile
+deploy:
+  kubectl:
+    manifests:
+      - hack/k8s/deployment.yaml

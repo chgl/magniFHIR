@@ -1,0 +1,172 @@
+services:
+  traefik:
+    image: docker.io/library/traefik:v2.8.1@sha256:1212133eacd6dd169f9cdc56161bc866788ec2debf66d7d504acf2fc80233c10
+    restart: unless-stopped
+    ipc: none
+    security_opt:
+      - "no-new-privileges:true"
+    cap_drop:
+      - ALL
+    read_only: true
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "127.0.0.1:80:80"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    deploy:
+      resources:
+        limits:
+          memory: 128m
+
+  hapi-fhir-server:
+    image: docker.io/hapiproject/hapi:v6.0.1@sha256:63c98d8be3dadc77b47dca3115490f22bf99512f363f779f7bbcb42f569aeac3
+    restart: unless-stopped
+    cap_drop:
+      - ALL
+    ipc: none
+    security_opt:
+      - "no-new-privileges:true"
+    deploy:
+      resources:
+        limits:
+          memory: 2048m
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /app/target
+    privileged: false
+    environment:
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://hapi-fhir-db:5432/fhir?currentSchema=public"
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_DATASOURCE_DRIVERCLASSNAME: org.postgresql.Driver
+      spring.jpa.properties.hibernate.dialect: ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgres94Dialect
+      HAPI_FHIR_VALIDATION_REQUESTS_ENABLED: "false"
+      HAPI_FHIR_USE_APACHE_ADDRESS_STRATEGY: "true"
+      HAPI_FHIR_ENFORCE_REFERENTIAL_INTEGRITY_ON_DELETE: "false"
+      HAPI_FHIR_ENFORCE_REFERENTIAL_INTEGRITY_ON_WRITE: "false"
+      HAPI_FHIR_SUBSCRIPTION_RESTHOOK_ENABLED: "true"
+      HAPI_FHIR_ALLOW_MULTIPLE_DELETE: "true"
+    depends_on:
+      - hapi-fhir-db
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.fhir.loadbalancer.server.port=8080"
+      - "traefik.http.routers.fhir.rule=Host(`hapi-fhir-server.127.0.0.1.nip.io`)"
+      - "traefik.http.routers.fhir.entrypoints=web"
+
+  hapi-fhir-db:
+    image: docker.io/library/postgres:14.4@sha256:3e2eba0a6efbeb396e086c332c5a85be06997d2cf573d34794764625f405df4e
+    restart: unless-stopped
+    ipc: private
+    security_opt:
+      - "no-new-privileges:true"
+    privileged: false
+    shm_size: 1024m
+    deploy:
+      resources:
+        limits:
+          memory: 1536m
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: fhir
+
+  loader:
+    image: docker.io/curlimages/curl:7.84.0@sha256:5a2a25d96aa941ea2fc47acc50122f7c3d007399a075df61a82d6d2c3a567a2b
+    command: >
+      sh -c "curl -X POST -H 'Content-Type:application/fhir+json' --retry-connrefuse --connect-timeout 30 --max-time 60 --retry 5 --retry-delay 15 --data '@/data/hospitalInformation1658779445044.json' http://hapi-fhir-server:8080/fhir &&
+             curl -X POST -H 'Content-Type:application/fhir+json' --retry-connrefuse --connect-timeout 30 --max-time 60 --retry 5 --retry-delay 15 --data '@/data/practitionerInformation1658779445044.json' http://hapi-fhir-server:8080/fhir &&
+             curl -X POST -H 'Content-Type:application/fhir+json' --retry-connrefuse --connect-timeout 30 --max-time 60 --retry 5 --retry-delay 15 --data '@/data/Ashleigh_Olson_9d9b8bed-7b79-7fa9-cea1-f133a6b4d551.json' http://hapi-fhir-server:8080/fhir &&
+             curl -X POST -H 'Content-Type:application/fhir+json' --retry-connrefuse --connect-timeout 30 --max-time 60 --retry 5 --retry-delay 15 --data '@/data/Eugene_Purdy_2500b9ad-56c8-447d-d0b4-589dea3008ba.json' http://hapi-fhir-server:8080/fhir &&
+             curl -X POST -H 'Content-Type:application/fhir+json' --retry-connrefuse --connect-timeout 30 --max-time 60 --retry 5 --retry-delay 15 --data '@/data/Grace_Jenkins_0b72a5cf-ab16-61cb-4cdc-727a1078fdd6.json' http://hapi-fhir-server:8080/fhir &&
+             curl -X POST -H 'Content-Type:application/fhir+json' --retry-connrefuse --connect-timeout 30 --max-time 60 --retry 5 --retry-delay 15 --data '@/data/Latina_Hana_Turcotte_c4b841d9-b890-48d1-cb0c-87450e1f2737.json' http://hapi-fhir-server:8080/fhir &&
+             curl -X POST -H 'Content-Type:application/fhir+json' --retry-connrefuse --connect-timeout 30 --max-time 60 --retry 5 --retry-delay 15 --data '@/data/Mattie_Zboncak_c423a667-3ea7-f553-a179-a4cf1948221f.json' http://hapi-fhir-server:8080/fhir"
+    volumes:
+      - ./fhir:/data:ro
+    depends_on:
+      - hapi-fhir-server
+
+  l4h-fhir-db:
+    image: docker.io/library/postgres:14.4@sha256:3e2eba0a6efbeb396e086c332c5a85be06997d2cf573d34794764625f405df4e
+    restart: unless-stopped
+    ipc: private
+    security_opt:
+      - "no-new-privileges:true"
+    privileged: false
+    shm_size: 1024m
+    deploy:
+      resources:
+        limits:
+          memory: 1536m
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: fhir
+
+  fhir-schematool:
+    image: docker.io/ibmcom/ibm-fhir-schematool:4.11.1@sha256:e9a2b8ff795d4fdf9edd4d43cded87ac1d9bff6141b0a84e05c12a9a9043a315
+    restart: on-failure
+    environment:
+      ENV_SKIP: "false" # Set to true if you want to manage postgres schema yourself (or once schema is initialized)
+    command: --tool.behavior=onboard --db.type=postgresql --db.host=l4h-fhir-db --db.port=5432 --db.database=fhir --sslConnection=false --grant.to=postgres --user=postgres --password=postgres
+    depends_on:
+      - l4h-fhir-db
+
+  l4h-fhir-server:
+    image: docker.io/ibmcom/ibm-fhir-server:4.11.1@sha256:e25a080ef92c663aae2c14ebc9add5673656d845eefe0a809916e42dbbcb4cee
+    restart: unless-stopped
+    cap_drop:
+      - ALL
+    ipc: none
+    security_opt:
+      - "no-new-privileges:true"
+    privileged: false
+    volumes:
+      - ./l4h-config/fhir-server-config.json:/opt/ol/wlp/usr/servers/defaultServer/config/default/fhir-server-config.json:ro
+      - ./l4h-config/overrides:/opt/ol/wlp/usr/servers/defaultServer/configDropins/overrides:ro
+    environment:
+      FHIR_USER_PASSWORD: change-user-password
+      FHIR_ADMIN_PASSWORD: change-admin-password
+    depends_on:
+      - l4h-fhir-db
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.l4h-fhir.loadbalancer.server.port=9080"
+      - "traefik.http.routers.l4h-fhir.rule=Host(`l4h-fhir-server.127.0.0.1.nip.io`)"
+      - "traefik.http.routers.l4h-fhir.entrypoints=web"
+
+  fhir-server-for-azure:
+    image: mcr.microsoft.com/healthcareapis/r4-fhir-server:3.0.36@sha256:6239ab2f87793c76b6a21b095dbb3a25cfaba1318c1d8572e0df8d6c7061b4e2
+    restart: unless-stopped
+    cap_drop:
+      - ALL
+    ipc: none
+    security_opt:
+      - "no-new-privileges:true"
+    privileged: false
+    environment:
+      FHIRServer__Security__Enabled: "false"
+      SqlServer__ConnectionString: "Server=tcp:fhir-server-for-azure-mssql-db,1433;Initial Catalog=FHIR;Persist Security Info=False;User ID=sa;Password=37e9211d1b3!017c2d457e4c3d_f69947bdaab16806ea215ad;MultipleActiveResultSets=False;Connection Timeout=30;TrustServerCertificate=true;"
+      SqlServer__AllowDatabaseCreation: "true"
+      SqlServer__Initialize: "true"
+      SqlServer__SchemaOptions__AutomaticUpdatesEnabled: "true"
+      DataStore: "SqlServer"
+    depends_on:
+      - sql
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.azure-fhir.loadbalancer.server.port=8080"
+      - "traefik.http.routers.azure-fhir.rule=Host(`azure-fhir-server.127.0.0.1.nip.io`)"
+      - "traefik.http.routers.azure-fhir.entrypoints=web"
+
+  fhir-server-for-azure-mssql-db:
+    image: mcr.microsoft.com/mssql/server:2022-latest@sha256:85495b6c68b58a81a31d37f7e1e1d36384a75baf28bd2b16c77faa5905838126
+    ipc: private
+    security_opt:
+      - "no-new-privileges:true"
+    privileged: false
+    environment:
+      SA_PASSWORD: 37e9211d1b3!017c2d457e4c3d_f69947bdaab16806ea215ad
+      ACCEPT_EULA: "Y"

@@ -1,0 +1,106 @@
+name: ci
+
+on:
+  push:
+    branches: [master]
+  release:
+    types: [created]
+  pull_request:
+    branches: [master]
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-22.04
+    permissions:
+      id-token: write
+      security-events: write
+      packages: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # tag=v3
+
+      - name: Docker meta
+        id: docker_meta
+        uses: docker/metadata-action@69f6fc9d46f2f8bf0d5491e4aabe0bb8c6a4678a # tag=v4
+        with:
+          images: |
+            ghcr.io/chgl/magnifhir
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@49ed152c8eca782a232dede0303416e8f356c37b # tag=v2
+        if: github.event_name != 'pull_request'
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Cache Docker layers
+        uses: actions/cache@c3f1317a9e7b1ef106c153ac8c0f00fed3ddbc0d # tag=v3
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      - name: Run unit tests
+        id: docker_build_unit_test
+        uses: docker/build-push-action@1cb9d22b932e4832bb29793b7777ec860fc1cde0 # tag=v3
+        with:
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
+          push: false
+          target: test
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@dc7b9719a96d48369863986a06765841d7ea23f6 # tag=v2
+
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@1cb9d22b932e4832bb29793b7777ec860fc1cde0 # tag=v3
+        with:
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.docker_meta.outputs.tags }}
+          labels: ${{ steps.docker_meta.outputs.labels }}
+          load: ${{ github.event_name == 'pull_request' }}
+
+      - name: List images
+        id: list_images
+        run: |
+          docker image ls
+          IMAGES=(${{ steps.docker_meta.outputs.tags }})
+          echo "##[set-output name=image_name;]${IMAGES[0]}"
+
+      - name: Install Cosign
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: sigstore/cosign-installer@48866aa521d8bf870604709cd43ec2f602d03ff2 # tag=v2.4.1
+
+      - name: Sign images
+        if: ${{ github.event_name != 'pull_request' }}
+        env:
+          COSIGN_EXPERIMENTAL: "true"
+          IMAGES: ${{ steps.docker_meta.outputs.tags }}
+        run: |
+          while read -r image; do
+            echo "Signing '$image' using keyless approach"
+            cosign sign "$image"
+          done <<< "$IMAGES"
+
+  release:
+    needs: build
+    name: Release
+    runs-on: ubuntu-22.04
+    if: github.event_name != 'pull_request'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # tag=v3
+
+      - name: Semantic Release
+        uses: cycjimmy/semantic-release-action@3b88c82b34098e8b51e401c1082c9170b0a3ec3c # tag=v3
+        with:
+          extra_plugins: |
+            conventional-changelog-conventionalcommits@5.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.SEMANTIC_RELEASE_TOKEN }}
