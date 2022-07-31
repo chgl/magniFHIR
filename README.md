@@ -11,6 +11,14 @@ docker run --rm -it -p 127.0.0.1:8080:8080 \
     ghcr.io/chgl/magnifhir:latest
 ```
 
+## Screenshots
+
+![Screenshot showing the server selection](/docs/img/screenshots/server-selection.png "Configure multiple FHIR servers to connect to")
+
+![Screenshot showing the patient browser](/docs/img/screenshots/patient-browser.png "List all Patient resources stored in the server")
+
+![Screenshot showing the patient record conditions tab](/docs/img/screenshots/patient-record-conditions.png "See a Patient's conditions, observations, and medications")
+
 ## Configuration
 
 Multiple FHIR servers can be configured including support for basic authentication.
@@ -54,7 +62,7 @@ This will start three FHIR servers and their corresponding databases. The server
 reverse proxy to provide nice URLs that are resolved to `localhost`:
 
 | Type                                                                                    | Base URL                                                     |
-|-----------------------------------------------------------------------------------------|--------------------------------------------------------------|
+| --------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
 | [HAPI FHIR JPA Server Starter](https://github.com/hapifhir/hapi-fhir-jpaserver-starter) | <http://hapi-fhir-server.127.0.0.1.nip.io/fhir>              |
 | [Linux4Health FHIR Server](https://github.com/LinuxForHealth/FHIR)                      | <http://l4h-fhir-server.127.0.0.1.nip.io/fhir-server/api/v4> |
 | [FHIR Server for Azure](https://github.com/microsoft/fhir-server)                       | <http://azure-fhir-server.127.0.0.1.nip.io/>                 |
