@@ -11,6 +11,8 @@ docker run --rm -it -p 127.0.0.1:8080:8080 \
     ghcr.io/chgl/magnifhir:latest
 ```
 
+Open <http://localhost:8080/> in your browser, select the `HAPI FHIR Test Server` in the server selection and click on `Patient Browser` in the left-hand menu.
+
 ## Screenshots
 
 ![Screenshot showing the server selection](/docs/img/screenshots/server-selection.png "Configure multiple FHIR servers to connect to")

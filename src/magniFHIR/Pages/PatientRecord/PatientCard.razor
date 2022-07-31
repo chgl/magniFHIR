@@ -10,7 +10,7 @@
         <CardHeaderContent>
             <MudText Typo="Typo.body1">@Name</MudText>
             <MudText Typo="Typo.body2">
-                @Patient.Gender
+                @Patient?.Gender
             </MudText>
             <MudText Typo="Typo.body2">
                 @BirthDate
@@ -21,14 +21,19 @@
 
 @code {
     [Parameter]
-    public Patient Patient { get; set; }
-    public string Name => HumanNamesToDisplayName(this.Patient.Name) ?? this.Patient.Id;
-    public string BirthDate => this.Patient.BirthDate;
+    public Patient? Patient { get; set; }
+    public string? Name => HumanNamesToDisplayName(this.Patient?.Name) ?? this.Patient?.Id;
+    public string? BirthDate => this.Patient?.BirthDate;
 
     public bool? IsDeceased
     {
         get
         {
+            if (this.Patient is null)
+            {
+                return null;
+            }
+
             if (this.Patient.Deceased is FhirBoolean isDeceased)
             {
                 return isDeceased.Value;
@@ -43,7 +48,7 @@
         }
     }
 
-    private static string? HumanNamesToDisplayName(List<HumanName> humanName)
+    private static string? HumanNamesToDisplayName(List<HumanName>? humanName)
     {
         if (humanName is null || humanName.Count == 0)
         {

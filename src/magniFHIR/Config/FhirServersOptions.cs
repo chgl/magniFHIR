@@ -58,6 +58,11 @@ public class FhirServerConfig
 
         return slug.ToString().Trim().ToLowerInvariant();
     }
+
+    public override int GetHashCode()
+    {
+        return this.Name?.GetHashCode() ?? 0;
+    }
 }
 
 public class FhirServerAuthConfig

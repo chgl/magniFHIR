@@ -3,7 +3,14 @@ using Hl7.Fhir.Rest;
 
 namespace magniFHIR.Data
 {
-    public class FhirService
+    public interface IFhirService
+    {
+        Task<Bundle> GetPatientsAsync(string serverNameSlug);
+        Task<Patient?> GetPatientsByIdAsync(string serverNameSlug, string resourceId);
+        Task<List<TResource>> GetResourcesByPatientIdAsync<TResource>(string serverNameSlug, string patientResourceId, string orderBy = "_lastUpdated") where TResource : Resource;
+    }
+
+    public class FhirService : IFhirService
     {
         private readonly IHttpClientFactory clientFactory;
         private readonly FhirServersOptions serversOptions;
@@ -45,7 +52,7 @@ namespace magniFHIR.Data
             return resultList;
         }
 
-        public async Task<Patient> GetPatientsByIdAsync(string serverNameSlug, string resourceId)
+        public async Task<Patient?> GetPatientsByIdAsync(string serverNameSlug, string resourceId)
         {
             var fhirClient = GetFhirClientFromServerNameSlug(serverNameSlug);
 

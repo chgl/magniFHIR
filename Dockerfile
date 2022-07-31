@@ -12,17 +12,14 @@ COPY magniFHIR.sln .
 COPY src/magniFHIR/magniFHIR.csproj src/magniFHIR/magniFHIR.csproj
 COPY src/magniFHIR.Tests/magniFHIR.Tests.csproj src/magniFHIR.Tests/magniFHIR.Tests.csproj
 
-RUN --mount=type=cache,target=/root/.nuget/packages \
-    dotnet restore magniFHIR.sln
+RUN dotnet restore magniFHIR.sln
 
 FROM build AS publish-release
 COPY src/ src/
-RUN --mount=type=cache,target=/root/.nuget/packages \
-    dotnet publish --no-restore -c Release -o /out/release
+RUN dotnet publish --no-restore -c Release -o /out/release
 
 FROM publish-release AS test
-RUN --mount=type=cache,target=/root/.nuget/packages \
-    dotnet test src/magniFHIR.Tests/magniFHIR.Tests.csproj \
+RUN dotnet test src/magniFHIR.Tests/magniFHIR.Tests.csproj \
     --no-restore -p:CollectCoverage=true
 
 FROM base AS release

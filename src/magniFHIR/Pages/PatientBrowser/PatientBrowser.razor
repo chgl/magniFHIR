@@ -1,7 +1,7 @@
 @page "/servers/{fhirServerNameSlug}/browser"
 @using Hl7.Fhir.Model
 @using magniFHIR.Data
-@inject FhirService PatientService
+@inject IFhirService FhirService
 @inject NavigationManager NavManager
 
 <PageTitle>Patient Browser</PageTitle>
@@ -36,7 +36,7 @@ else
             <MudTd DataLabel="Gender">@context.Gender</MudTd>
             <MudTd DataLabel="MRN">@(string.Join(", ", context.MedicalRecordNumbers()))</MudTd>
             <MudTd DataLabel="Id">@context.Id</MudTd>
-            <MudTd DataLabel="LastUpdated">@context.Meta.LastUpdated</MudTd>
+            <MudTd DataLabel="LastUpdated">@context.Meta?.LastUpdated</MudTd>
             <MudTd>
                 <MudButton Size="Size.Small" Variant="Variant.Outlined" Color="Color.Secondary"
                 EndIcon="@Icons.Material.Filled.ContactPage"
@@ -52,7 +52,6 @@ else
     [Parameter]
     public string? FhirServerNameSlug { get; set; }
     private List<Patient>? patients;
-    private Exception Error;
 
     protected override async System.Threading.Tasks.Task OnInitializedAsync()
     {
@@ -61,7 +60,7 @@ else
             throw new InvalidOperationException("Requested patient browser without server name set.");
         }
 
-        var bundle = await PatientService.GetPatientsAsync(FhirServerNameSlug);
+        var bundle = await FhirService.GetPatientsAsync(FhirServerNameSlug);
 
         patients = bundle.Entry.Select(entry => entry.Resource).Cast<Patient>().ToList();
     }

@@ -17,4 +17,18 @@
 
     tableRows.Should().BeEmpty();
   }
+
+  [Fact]
+  public void RendersEmptyRowWithConditionListWithSingleEmptyCondition()
+  {
+    var emptyCondition = new Condition();
+
+    var cut = RenderComponent<ConditionTable>(parameters => parameters
+    .Add(p => p.Conditions, new List<Condition>() { emptyCondition })
+    );
+
+    var tableRows = cut.FindAll("table > tbody > tr");
+
+    tableRows.Should().HaveCount(1);
+  }
 }
