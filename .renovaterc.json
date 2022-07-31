@@ -4,6 +4,7 @@
     "config:base",
     ":disableDependencyDashboard",
     "helpers:pinGitHubActionDigests",
-    "group:allNonMajor"
+    "group:allNonMajor",
+    "docker:pinDigests"
   ]
 }
