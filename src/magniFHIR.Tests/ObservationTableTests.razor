@@ -10,11 +10,25 @@
     public void RendersEmptyWithEmptyConditionList()
     {
         var cut = RenderComponent<ObservationTable>(parameters => parameters
-        .Add(p => p.Observations, new List<Observation>())
+        .Add(p => p.Observations, new())
         );
 
         var tableRows = cut.FindAll("table > tbody > tr");
 
         tableRows.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void RendersEmptyRowWithObservationListWithSingleEmptyObservation()
+    {
+        var emptyObservation = new Observation();
+
+        var cut = RenderComponent<ObservationTable>(parameters => parameters
+        .Add(p => p.Observations, new() { emptyObservation })
+        );
+
+        var tableRows = cut.FindAll("table > tbody > tr");
+
+        tableRows.Should().HaveCount(1);
     }
 }

@@ -12,16 +12,19 @@
     <RowTemplate>
         <MudTd DataLabel="Issued">@context.Issued</MudTd>
         <MudTd DataLabel="Text">
-            <MudText Typo="Typo.subtitle1">@context.Code.Text</MudText>
-            @foreach (var coding in @context.Code.Coding)
+            @if (@context.Code is not null)
             {
-                <MudText Typo="Typo.subtitle2">@coding.System#@coding.Code (@coding.Display)</MudText>
+                <MudText Typo="Typo.subtitle1">@context.Code.Text</MudText>
+                @foreach (var coding in @context.Code.Coding)
+                {
+                    <MudText Typo="Typo.subtitle2">@coding.System#@coding.Code (@coding.Display)</MudText>
+                }
             }
         </MudTd>
-        <MudTd DataLabel="Value">@ObservationValueToDisplay(context.Value)</MudTd>
+        <MudTd DataLabel="Value">@(ObservationValueToDisplay(context.Value) ?? "N/A")</MudTd>
         <MudTd DataLabel="Status">@context.Status</MudTd>
         <MudTd DataLabel="Effective">@context.Effective</MudTd>
-        <MudTd DataLabel="LastUpdated">@context.Meta.LastUpdated</MudTd>
+        <MudTd DataLabel="LastUpdated">@context.Meta?.LastUpdated</MudTd>
     </RowTemplate>
 </MudTable>
 
@@ -30,11 +33,11 @@
     [Parameter]
     public List<Observation>? Observations { get; set; }
 
-    private static string ObservationValueToDisplay(DataType value)
+    private static string? ObservationValueToDisplay(DataType value)
     {
         if (value is null)
         {
-            return "N/A";
+            return null;
         }
 
         switch (value)

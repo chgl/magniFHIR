@@ -12,15 +12,18 @@
         <MudTd DataLabel="RecordedDate">@(context.RecordedDate is null ? "N/A" :
             DateTimeOffset.Parse(context.RecordedDate))</MudTd>
         <MudTd DataLabel="Text">
-            <MudText Typo="Typo.subtitle1">@context.Code.Text</MudText>
-            @foreach (var coding in @context.Code.Coding)
+            @if (@context.Code is not null)
             {
-                <MudText Typo="Typo.subtitle2">@coding.System: @coding.Code (@coding.Display)</MudText>
+                <MudText Typo="Typo.subtitle1">@context.Code.Text</MudText>
+                @foreach (var coding in @context.Code.Coding)
+                {
+                    <MudText Typo="Typo.subtitle2">@coding.System: @coding.Code (@coding.Display)</MudText>
+                }
             }
         </MudTd>
         <MudTd DataLabel="ClinicalStatus">@context.ClinicalStatus?.Coding.FirstOrDefault()?.Code</MudTd>
         <MudTd DataLabel="VerificationStatus">@context.VerificationStatus?.Coding.FirstOrDefault()?.Code</MudTd>
-        <MudTd DataLabel="LastUpdated">@context.Meta.LastUpdated</MudTd>
+        <MudTd DataLabel="LastUpdated">@context.Meta?.LastUpdated</MudTd>
     </RowTemplate>
 </MudTable>
 

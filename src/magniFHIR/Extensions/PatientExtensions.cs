@@ -7,7 +7,13 @@ public static class PatientExtensions
 
     public static string DisplayName(this Patient @this)
     {
-        return @this.Name.FirstOrDefault().Family;
+        var name = @this.Name.Find(name => name.Use == HumanName.NameUse.Usual) ?? @this.Name.FirstOrDefault();
+        if (name is null)
+        {
+            return "N/A";
+        }
+
+        return $"{string.Join(" ", name.Given)} {name.Family}";
     }
 
     public static IEnumerable<string> MedicalRecordNumbers(this Patient @this)

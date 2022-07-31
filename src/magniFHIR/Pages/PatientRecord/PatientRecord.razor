@@ -2,7 +2,7 @@
 @using Hl7.Fhir.Model
 @using magniFHIR.Data
 @inject NavigationManager NavigationManager
-@inject FhirService PatientService
+@inject IFhirService FhirService
 
 <PageTitle>Patient Record</PageTitle>
 
@@ -43,14 +43,14 @@
 
         if (SearchedForPatientId is not null && FhirServerNameSlug is not null)
         {
-            FoundPatient = await PatientService.GetPatientsByIdAsync(FhirServerNameSlug, SearchedForPatientId);
+            FoundPatient = await FhirService.GetPatientsByIdAsync(FhirServerNameSlug, SearchedForPatientId);
 
-            Conditions = await PatientService.GetResourcesByPatientIdAsync<Condition>(
+            Conditions = await FhirService.GetResourcesByPatientIdAsync<Condition>(
             FhirServerNameSlug,
             SearchedForPatientId,
             "recorded-date");
 
-            Observations = await PatientService.GetResourcesByPatientIdAsync<Observation>(
+            Observations = await FhirService.GetResourcesByPatientIdAsync<Observation>(
             FhirServerNameSlug,
             SearchedForPatientId,
             "date");
