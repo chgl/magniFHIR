@@ -1,4 +1,3 @@
-@using Hl7.Fhir.Model
 @using magniFHIR.Pages.PatientBrowser;
 @using magniFHIR.Data
 
@@ -6,39 +5,39 @@
 
 @code
 {
-  [Fact]
-  public void RendersEmptyWithEmptyPatientList()
-  {
-    var fakeFhirService = A.Fake<IFhirService>();
-    A.CallTo(() => fakeFhirService.GetPatientsAsync(A<string>._))
-    .Returns(System.Threading.Tasks.Task.FromResult(new Bundle()));
+    [Fact]
+    public void RendersEmptyWithEmptyPatientList()
+    {
+        var fakeFhirService = A.Fake<IFhirService>();
+        A.CallTo(() => fakeFhirService.GetPatientsAsync(A<string>._))
+        .Returns(System.Threading.Tasks.Task.FromResult(new Bundle()));
 
-    Services.AddSingleton<IFhirService>(fakeFhirService);
+        Services.AddSingleton<IFhirService>(fakeFhirService);
 
-    var cut = RenderComponent<PatientBrowser>(parameters => parameters.Add(p => p.FhirServerNameSlug, "test"));
+        var cut = RenderComponent<PatientBrowser>(parameters => parameters.Add(p => p.FhirServerNameSlug, "test"));
 
-    var tableRows = cut.FindAll("table > tbody > tr");
+        var tableRows = cut.FindAll("table > tbody > tr");
 
-    tableRows.Should().BeEmpty();
-  }
+        tableRows.Should().BeEmpty();
+    }
 
-  [Fact]
-  public void RendersEmptyRowWithPatientWithEvertythingUnset()
-  {
-    var emptyPatient = new Patient();
-    var bundle = new Bundle();
-    bundle.AddResourceEntry(emptyPatient, "Patient/1");
+    [Fact]
+    public void RendersEmptyRowWithPatientWithEvertythingUnset()
+    {
+        var emptyPatient = new Patient();
+        var bundle = new Bundle();
+        bundle.AddResourceEntry(emptyPatient, "Patient/1");
 
-    var fakeFhirService = A.Fake<IFhirService>();
-    A.CallTo(() => fakeFhirService.GetPatientsAsync(A<string>._))
-      .Returns(System.Threading.Tasks.Task.FromResult(bundle));
+        var fakeFhirService = A.Fake<IFhirService>();
+        A.CallTo(() => fakeFhirService.GetPatientsAsync(A<string>._))
+          .Returns(System.Threading.Tasks.Task.FromResult(bundle));
 
-    Services.AddSingleton<IFhirService>(fakeFhirService);
+        Services.AddSingleton<IFhirService>(fakeFhirService);
 
-    var cut = RenderComponent<PatientBrowser>(parameters => parameters.Add(p => p.FhirServerNameSlug, "test"));
+        var cut = RenderComponent<PatientBrowser>(parameters => parameters.Add(p => p.FhirServerNameSlug, "test"));
 
-    var tableRows = cut.FindAll("table > tbody > tr");
+        var tableRows = cut.FindAll("table > tbody > tr");
 
-    tableRows.Should().HaveCount(1);
-  }
+        tableRows.Should().HaveCount(1);
+    }
 }
