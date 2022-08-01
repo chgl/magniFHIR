@@ -1,34 +1,28 @@
-@using Hl7.Fhir.Model
 @using magniFHIR.Pages.PatientRecord;
-@using FluentAssertions;
 
 @inherits TestContext
 
 @code
 {
-  [Fact]
-  public void RendersEmptyWithEmptyConditionList()
-  {
-    var cut = RenderComponent<ConditionTable>(parameters => parameters
-    .Add(p => p.Conditions, new List<Condition>())
-    );
+    [Fact]
+    public void RendersEmptyWithEmptyConditionList()
+    {
+        var cut = RenderComponent<ConditionTable>(parameters => parameters.Add(p => p.Conditions, new()));
 
-    var tableRows = cut.FindAll("table > tbody > tr");
+        var tableRows = cut.FindAll("table > tbody > tr");
 
-    tableRows.Should().BeEmpty();
-  }
+        tableRows.Should().BeEmpty();
+    }
 
-  [Fact]
-  public void RendersEmptyRowWithConditionListWithSingleEmptyCondition()
-  {
-    var emptyCondition = new Condition();
+    [Fact]
+    public void RendersEmptyRowWithConditionListWithSingleEmptyCondition()
+    {
+        var emptyCondition = new Condition();
 
-    var cut = RenderComponent<ConditionTable>(parameters => parameters
-    .Add(p => p.Conditions, new List<Condition>() { emptyCondition })
-    );
+        var cut = RenderComponent<ConditionTable>(parameters => parameters.Add(p => p.Conditions, new() { emptyCondition }));
 
-    var tableRows = cut.FindAll("table > tbody > tr");
+        var tableRows = cut.FindAll("table > tbody > tr");
 
-    tableRows.Should().HaveCount(1);
-  }
+        tableRows.Should().HaveCount(1);
+    }
 }

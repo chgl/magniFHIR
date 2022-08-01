@@ -35,17 +35,17 @@ else
             <MudTd DataLabel="BirthDate">@context.BirthDate</MudTd>
             <MudTd DataLabel="Gender">@context.Gender</MudTd>
             <MudTd DataLabel="MRN">@(string.Join(", ", context.MedicalRecordNumbers()))</MudTd>
-            <MudTd DataLabel="Id">@context.Id</MudTd>
-            <MudTd DataLabel="LastUpdated">@context.Meta?.LastUpdated</MudTd>
-            <MudTd>
-                <MudButton Size="Size.Small" Variant="Variant.Outlined" Color="Color.Secondary"
-                EndIcon="@Icons.Material.Filled.ContactPage"
-                Href="@($"/servers/{FhirServerNameSlug}/patients/{context.Id}")" Target="_blank">
-                    View Record
-                </MudButton>
-            </MudTd>
-        </RowTemplate>
-    </MudTable>
+                <MudTd DataLabel="Id">@context.Id</MudTd>
+                <MudTd DataLabel="LastUpdated">@context.Meta?.LastUpdated</MudTd>
+                <MudTd>
+                    <MudButton Size="Size.Small" Variant="Variant.Outlined" Color="Color.Secondary"
+                       EndIcon="@Icons.Material.Filled.ContactPage"
+                       Href="@($"/servers/{FhirServerNameSlug}/patients/{context.Id}")" Target="_blank">
+                        View Record
+                    </MudButton>
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
 }
 
 @code {

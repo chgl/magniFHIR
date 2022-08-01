@@ -1,6 +1,4 @@
-@using Hl7.Fhir.Model
 @using magniFHIR.Pages.PatientRecord;
-@using FluentAssertions;
 
 @inherits TestContext
 
@@ -9,9 +7,7 @@
     [Fact]
     public void RendersEmptyWithEmptyConditionList()
     {
-        var cut = RenderComponent<ObservationTable>(parameters => parameters
-        .Add(p => p.Observations, new())
-        );
+        var cut = RenderComponent<ObservationTable>(parameters => parameters.Add(p => p.Observations, new()));
 
         var tableRows = cut.FindAll("table > tbody > tr");
 
@@ -23,9 +19,7 @@
     {
         var emptyObservation = new Observation();
 
-        var cut = RenderComponent<ObservationTable>(parameters => parameters
-        .Add(p => p.Observations, new() { emptyObservation })
-        );
+        var cut = RenderComponent<ObservationTable>(parameters => parameters.Add(p => p.Observations, new() { emptyObservation }));
 
         var tableRows = cut.FindAll("table > tbody > tr");
 

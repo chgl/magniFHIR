@@ -22,13 +22,13 @@
             }
         </MudTd>
         <MudTd DataLabel="Value">@(ObservationValueToDisplay(context.Value) ?? "N/A")</MudTd>
-        <MudTd DataLabel="Status">@context.Status</MudTd>
-        <MudTd DataLabel="Effective">@context.Effective</MudTd>
-        <MudTd DataLabel="LastUpdated">@context.Meta?.LastUpdated</MudTd>
-    </RowTemplate>
-</MudTable>
+            <MudTd DataLabel="Status">@context.Status</MudTd>
+            <MudTd DataLabel="Effective">@context.Effective</MudTd>
+            <MudTd DataLabel="LastUpdated">@context.Meta?.LastUpdated</MudTd>
+        </RowTemplate>
+    </MudTable>
 
-@code {
+    @code {
 
     [Parameter]
     public List<Observation>? Observations { get; set; }

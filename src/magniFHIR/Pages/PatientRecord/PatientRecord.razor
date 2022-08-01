@@ -7,8 +7,8 @@
 <PageTitle>Patient Record</PageTitle>
 
 <MudTextField @bind-Value="SearchedForPatientId" Label="Patient.id or Patient.identifier" Variant="Variant.Outlined"
-    Adornment="Adornment.End" AdornmentIcon="@Icons.Filled.Search" AdornmentColor="Color.Secondary" OnKeyUp="@OnKeyUp"
-    Class="mb-4" />
+              Adornment="Adornment.End" AdornmentIcon="@Icons.Filled.Search" AdornmentColor="Color.Secondary" OnKeyUp="@OnKeyUp"
+              Class="mb-4" />
 
 @if (FoundPatient is not null)
 {

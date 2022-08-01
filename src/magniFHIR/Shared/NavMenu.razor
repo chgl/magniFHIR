@@ -1,10 +1,12 @@
 ﻿<MudNavMenu>
     <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.LocalFireDepartment">Servers</MudNavLink>
     <MudNavLink Href="@($"/servers/{FhirServerNameSlug}/browser")" Match="NavLinkMatch.All"
-        Icon="@Icons.Material.Filled.Group" Disabled="@(FhirServerNameSlug is null)">Patient Browser
+                Icon="@Icons.Material.Filled.Group" Disabled="@(FhirServerNameSlug is null)">
+        Patient Browser
     </MudNavLink>
     <MudNavLink Href="@($"/servers/{FhirServerNameSlug}/patients")" Match="NavLinkMatch.All"
-        Icon="@Icons.Material.Filled.ContactPage" Disabled="@(FhirServerNameSlug is null)">Patient Record
+                Icon="@Icons.Material.Filled.ContactPage" Disabled="@(FhirServerNameSlug is null)">
+        Patient Record
     </MudNavLink>
 </MudNavMenu>
 

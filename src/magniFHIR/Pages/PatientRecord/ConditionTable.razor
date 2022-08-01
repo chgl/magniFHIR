@@ -9,8 +9,10 @@
         <MudTh>Last Updated</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="RecordedDate">@(context.RecordedDate is null ? "N/A" :
-            DateTimeOffset.Parse(context.RecordedDate))</MudTd>
+        <MudTd DataLabel="RecordedDate">
+            @(context.RecordedDate is null ? "N/A" :
+                DateTimeOffset.Parse(context.RecordedDate))
+        </MudTd>
         <MudTd DataLabel="Text">
             @if (@context.Code is not null)
             {
