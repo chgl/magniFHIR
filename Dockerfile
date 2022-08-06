@@ -16,7 +16,8 @@ RUN dotnet restore magniFHIR.sln
 
 FROM build AS publish-release
 COPY src/ src/
-RUN dotnet publish --no-restore -c Release -o /out/release
+ARG BUILD_VERSION=0.0.0
+RUN dotnet publish -p:Version=${BUILD_VERSION} --no-restore -c Release -o /out/release
 
 FROM publish-release AS test
 RUN dotnet test src/magniFHIR.Tests/magniFHIR.Tests.csproj \
