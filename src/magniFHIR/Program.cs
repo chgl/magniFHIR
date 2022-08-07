@@ -7,6 +7,7 @@ using OpenTelemetry.Trace;
 using System.Net;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Prometheus;
+using OpenTelemetry.Resources;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,6 +55,10 @@ if (isTracingEnabled)
     builder.Services.AddOpenTelemetryTracing(options =>
     {
         options
+            .ConfigureResource(r => r.AddService(
+                serviceName: serviceName,
+                serviceVersion: assemblyVersion,
+                serviceInstanceId: Environment.MachineName))
             .SetSampler(new AlwaysOnSampler())
             .AddHttpClientInstrumentation()
             .AddAspNetCoreInstrumentation(o =>

@@ -59,7 +59,7 @@ services:
       - "traefik.http.routers.fhir.entrypoints=web"
 
   hapi-fhir-db:
-    image: docker.io/library/postgres:14.4@sha256:3e2eba0a6efbeb396e086c332c5a85be06997d2cf573d34794764625f405df4e
+    image: docker.io/library/postgres:14.4@sha256:9ceb24f8c5f15c053d973a3610866f473690875dc13eb3282b45302189321040
     restart: unless-stopped
     ipc: private
     security_opt:
@@ -90,7 +90,7 @@ services:
       - hapi-fhir-server
 
   l4h-fhir-db:
-    image: docker.io/library/postgres:14.4@sha256:3e2eba0a6efbeb396e086c332c5a85be06997d2cf573d34794764625f405df4e
+    image: docker.io/library/postgres:14.4@sha256:9ceb24f8c5f15c053d973a3610866f473690875dc13eb3282b45302189321040
     restart: unless-stopped
     ipc: private
     security_opt:
@@ -115,7 +115,7 @@ services:
       - l4h-fhir-db
 
   l4h-fhir-server:
-    image: docker.io/ibmcom/ibm-fhir-server:4.11.1@sha256:e25a080ef92c663aae2c14ebc9add5673656d845eefe0a809916e42dbbcb4cee
+    image: docker.io/ibmcom/ibm-fhir-server:4.11.1@sha256:2433f739c48e4d8b087942d0f2df272d3d71cef8ee90f4b3d7ebc570413d6a0a
     restart: unless-stopped
     cap_drop:
       - ALL
@@ -170,3 +170,11 @@ services:
     environment:
       SA_PASSWORD: 37e9211d1b3!017c2d457e4c3d_f69947bdaab16806ea215ad
       ACCEPT_EULA: "Y"
+
+  jaeger:
+    image: docker.io/jaegertracing/all-in-one:1.37@sha256:60ab2e6b0682f79a4e42b2bd2526ac4de80a3a7a1ef136c71dc0cb85e9c50f46
+    ports:
+      - 127.0.0.1:16686:16686
+      - 6831:6831/udp
+      - 6832:6832/udp
+      - 4317:4317/tcp
