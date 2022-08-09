@@ -115,7 +115,7 @@ services:
       - l4h-fhir-db
 
   l4h-fhir-server:
-    image: docker.io/ibmcom/ibm-fhir-server:4.11.1@sha256:2433f739c48e4d8b087942d0f2df272d3d71cef8ee90f4b3d7ebc570413d6a0a
+    image: docker.io/ibmcom/ibm-fhir-server:4.11.1@sha256:3c429a6c5146e8ac83d5e117b9dadb034780911098e60b2388ff63b3cf240bfc
     restart: unless-stopped
     cap_drop:
       - ALL
