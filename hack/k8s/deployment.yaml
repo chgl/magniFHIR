@@ -14,6 +14,13 @@ spec:
       labels:
         app.kubernetes.io/name: magnifhir
     spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsUser: 65532
+        runAsGroup: 65532
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - image: magnifhir
           name: magnifhir
@@ -23,9 +30,7 @@ spec:
               drop:
                 - ALL
             privileged: false
-            runAsGroup: 65532
-            runAsUser: 65532
-            runAsNonRoot: true
+            readOnlyRootFilesystem: true
             seccompProfile:
               type: "RuntimeDefault"
           resources:
@@ -35,9 +40,19 @@ spec:
             limits:
               memory: 512Mi
               cpu: 1000m
+          livenessProbe:
+            httpGet:
+              path: /livez
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
           env:
             - name: ASPNETCORE_URLS
               value: "http://+:8080"
+            - name: COMPlus_EnableDiagnostics
+              value: "0"
           ports:
             - containerPort: 8080
               name: http
@@ -61,18 +76,3 @@ spec:
   ports:
     - port: 8080
       name: http
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: magnifhir-appsettings
-data:
-  appsettings.Production.json: |
-    {
-      "FhirServers": [
-        {
-          "Name": "HAPI FHIR JPA Server",
-          "BaseUrl": "http://hapi-fhir-server.svc/fhir"
-        }
-      ]
-    }
