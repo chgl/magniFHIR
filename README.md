@@ -80,16 +80,27 @@ dotnet watch --project=src/magniFHIR
 
 ### Kubernetes (KinD)
 
+Prerequisites:
+
+- [KinD](https://kind.sigs.k8s.io/)
+- [kubectl](https://kubernetes.io/docs/tasks/tools/)
+- [Kustomize](https://kustomize.io/)
+- [Skaffold](https://skaffold.dev/)
+- [Helm](https://helm.sh/)
+
 Create a cluster for testing using KinD:
 
 ```sh
 kind create cluster --name=magnifhir-dev
 ```
 
-Build container image and deploy to the cluster in development mode:
+Build the container image and deploy to the cluster in development mode:
 
 ```sh
 skaffold dev
 ```
 
-This doesn't yet start a FHIR server with sample data.
+This includes a HAPI FHIR server deployed via Helm and the same set of sample data as used
+by the Docker Compose setup.
+
+Skaffold is used to re-build the container image whenever the source code changes, deploy the HAPI FHIR server as a test-dependency, and also build and deploy the job used to load sample data into the server. See [skaffold.yaml](./skaffold.yaml) and the contents of the `hack/k8s` directory for details.

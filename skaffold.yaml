@@ -10,7 +10,28 @@ build:
       context: .
       docker:
         dockerfile: Dockerfile
+    - image: load-sample-data
+      context: hack/
+      docker:
+        dockerfile: hack/k8s/load-sample-data.Dockerfile
 deploy:
-  kubectl:
-    manifests:
-      - hack/k8s/deployment.yaml
+  kustomize:
+    paths:
+      - hack/k8s
+  helm:
+    releases:
+      - name: hapi-fhir-server
+        repo: https://hapifhir.github.io/hapi-fhir-jpaserver-starter/
+        remoteChart: hapi-fhir-jpaserver
+        version: 0.9.0
+        setValues:
+          postgresql.auth.postgresPassword: secretpassword
+        recreatePods: false
+        skipBuildDependencies: false
+        useHelmSecrets: false
+portForward:
+  - resourceType: service
+    namespace: default
+    resourceName: magnifhir
+    port: 8080
+    localPort: 8080
