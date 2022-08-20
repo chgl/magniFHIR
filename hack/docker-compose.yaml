@@ -1,6 +1,6 @@
 services:
   traefik:
-    image: docker.io/library/traefik:v2.8.1@sha256:4e52a5e2495484f5e19a49edfd2f652b0bce7b3603fa0df545ed90168ffae1c3
+    image: docker.io/library/traefik:v2.8.3@sha256:ad8c1935c4b901e10b62b6868d6369218793c69e7a7ea9c1d036fdc2b919e38e
     restart: unless-stopped
     ipc: none
     security_opt:
@@ -59,7 +59,7 @@ services:
       - "traefik.http.routers.fhir.entrypoints=web"
 
   hapi-fhir-db:
-    image: docker.io/library/postgres:14.4@sha256:9ceb24f8c5f15c053d973a3610866f473690875dc13eb3282b45302189321040
+    image: docker.io/library/postgres:14.5@sha256:f8816ada742348e1adfcec5c2a180b675bf6e4a294e0feb68bd70179451e1242
     restart: unless-stopped
     ipc: private
     security_opt:
@@ -92,7 +92,7 @@ services:
       - hapi-fhir-server
 
   l4h-fhir-db:
-    image: docker.io/library/postgres:14.4@sha256:9ceb24f8c5f15c053d973a3610866f473690875dc13eb3282b45302189321040
+    image: docker.io/library/postgres:14.5@sha256:f8816ada742348e1adfcec5c2a180b675bf6e4a294e0feb68bd70179451e1242
     restart: unless-stopped
     ipc: private
     security_opt:
@@ -140,7 +140,7 @@ services:
       - "traefik.http.routers.l4h-fhir.entrypoints=web"
 
   fhir-server-for-azure:
-    image: mcr.microsoft.com/healthcareapis/r4-fhir-server:3.0.40@sha256:c6304267061a7af71841f1719dbf12445ce6edc91c800b92c0d0738c0f88c3ac
+    image: mcr.microsoft.com/healthcareapis/r4-fhir-server:3.0.47@sha256:8d8a95038b6e8f6bc8c81045a300a8f668ee90119b853085c0d8fbdeafa6be75
     restart: unless-stopped
     cap_drop:
       - ALL
