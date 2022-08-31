@@ -50,6 +50,12 @@ services:
       HAPI_FHIR_ENFORCE_REFERENTIAL_INTEGRITY_ON_WRITE: "false"
       HAPI_FHIR_SUBSCRIPTION_RESTHOOK_ENABLED: "true"
       HAPI_FHIR_ALLOW_MULTIPLE_DELETE: "true"
+      JAVA_TOOL_OPTIONS: "-javaagent:/app/opentelemetry-javaagent.jar"
+      OTEL_TRACES_EXPORTER: "jaeger"
+      OTEL_METRICS_EXPORTER: "none"
+      OTEL_LOGS_EXPORTER: "none"
+      OTEL_SERVICE_NAME: "hapi-fhir-server"
+      OTEL_EXPORTER_JAEGER_ENDPOINT: "http://jaeger:14250"
     depends_on:
       - hapi-fhir-db
     labels:
@@ -77,15 +83,13 @@ services:
   loader:
     image: docker.io/curlimages/curl:7.85.0@sha256:9fab1b73f45e06df9506d947616062d7e8319009257d3a05d970b0de80a41ec5
     command: >
-      sh -c "curl -X POST -H 'Content-Type:application/fhir+json' --retry-connrefuse --connect-timeout 30 --max-time 60 --retry 5 --retry-delay 15 --data '@/data/hospitalInformation1658779445044.json' ${FHIR_SERVER_URL} &&
-             curl -X POST -H 'Content-Type:application/fhir+json' --retry-connrefuse --connect-timeout 30 --max-time 60 --retry 5 --retry-delay 15 --data '@/data/practitionerInformation1658779445044.json' ${FHIR_SERVER_URL} &&
-             curl -X POST -H 'Content-Type:application/fhir+json' --retry-connrefuse --connect-timeout 30 --max-time 60 --retry 5 --retry-delay 15 --data '@/data/Ashleigh_Olson_9d9b8bed-7b79-7fa9-cea1-f133a6b4d551.json' ${FHIR_SERVER_URL} &&
-             curl -X POST -H 'Content-Type:application/fhir+json' --retry-connrefuse --connect-timeout 30 --max-time 60 --retry 5 --retry-delay 15 --data '@/data/Eugene_Purdy_2500b9ad-56c8-447d-d0b4-589dea3008ba.json' ${FHIR_SERVER_URL} &&
-             curl -X POST -H 'Content-Type:application/fhir+json' --retry-connrefuse --connect-timeout 30 --max-time 60 --retry 5 --retry-delay 15 --data '@/data/Grace_Jenkins_0b72a5cf-ab16-61cb-4cdc-727a1078fdd6.json' ${FHIR_SERVER_URL} &&
-             curl -X POST -H 'Content-Type:application/fhir+json' --retry-connrefuse --connect-timeout 30 --max-time 60 --retry 5 --retry-delay 15 --data '@/data/Latina_Hana_Turcotte_c4b841d9-b890-48d1-cb0c-87450e1f2737.json' ${FHIR_SERVER_URL} &&
-             curl -X POST -H 'Content-Type:application/fhir+json' --retry-connrefuse --connect-timeout 30 --max-time 60 --retry 5 --retry-delay 15 --data '@/data/Mattie_Zboncak_c423a667-3ea7-f553-a179-a4cf1948221f.json' ${FHIR_SERVER_URL}"
-    environment:
-      FHIR_SERVER_URL: http://hapi-fhir-server:8080/fhir
+      sh -c "curl -X POST -H 'Content-Type:application/fhir+json' --retry-connrefuse --connect-timeout 30 --max-time 60 --retry 5 --retry-delay 15 --data '@/data/hospitalInformation1658779445044.json' http://hapi-fhir-server:8080/fhir &&
+             curl -X POST -H 'Content-Type:application/fhir+json' --retry-connrefuse --connect-timeout 30 --max-time 60 --retry 5 --retry-delay 15 --data '@/data/practitionerInformation1658779445044.json' http://hapi-fhir-server:8080/fhir &&
+             curl -X POST -H 'Content-Type:application/fhir+json' --retry-connrefuse --connect-timeout 30 --max-time 60 --retry 5 --retry-delay 15 --data '@/data/Ashleigh_Olson_9d9b8bed-7b79-7fa9-cea1-f133a6b4d551.json' http://hapi-fhir-server:8080/fhir &&
+             curl -X POST -H 'Content-Type:application/fhir+json' --retry-connrefuse --connect-timeout 30 --max-time 60 --retry 5 --retry-delay 15 --data '@/data/Eugene_Purdy_2500b9ad-56c8-447d-d0b4-589dea3008ba.json' http://hapi-fhir-server:8080/fhir &&
+             curl -X POST -H 'Content-Type:application/fhir+json' --retry-connrefuse --connect-timeout 30 --max-time 60 --retry 5 --retry-delay 15 --data '@/data/Grace_Jenkins_0b72a5cf-ab16-61cb-4cdc-727a1078fdd6.json' http://hapi-fhir-server:8080/fhir &&
+             curl -X POST -H 'Content-Type:application/fhir+json' --retry-connrefuse --connect-timeout 30 --max-time 60 --retry 5 --retry-delay 15 --data '@/data/Latina_Hana_Turcotte_c4b841d9-b890-48d1-cb0c-87450e1f2737.json' http://hapi-fhir-server:8080/fhir &&
+             curl -X POST -H 'Content-Type:application/fhir+json' --retry-connrefuse --connect-timeout 30 --max-time 60 --retry 5 --retry-delay 15 --data '@/data/Mattie_Zboncak_c423a667-3ea7-f553-a179-a4cf1948221f.json' http://hapi-fhir-server:8080/fhir"
     volumes:
       - ./fhir:/data:ro
     depends_on:
@@ -94,6 +98,8 @@ services:
   l4h-fhir-db:
     image: docker.io/library/postgres:14.5@sha256:f8816ada742348e1adfcec5c2a180b675bf6e4a294e0feb68bd70179451e1242
     restart: unless-stopped
+    profiles:
+      - l4h
     ipc: private
     security_opt:
       - "no-new-privileges:true"
@@ -110,6 +116,8 @@ services:
   fhir-schematool:
     image: docker.io/ibmcom/ibm-fhir-schematool:4.11.1@sha256:e9a2b8ff795d4fdf9edd4d43cded87ac1d9bff6141b0a84e05c12a9a9043a315
     restart: on-failure
+    profiles:
+      - l4h
     environment:
       ENV_SKIP: "false" # Set to true if you want to manage postgres schema yourself (or once schema is initialized)
     command: --tool.behavior=onboard --db.type=postgresql --db.host=l4h-fhir-db --db.port=5432 --db.database=fhir --sslConnection=false --grant.to=postgres --user=postgres --password=postgres
@@ -119,6 +127,8 @@ services:
   l4h-fhir-server:
     image: docker.io/ibmcom/ibm-fhir-server:4.11.1@sha256:2433f739c48e4d8b087942d0f2df272d3d71cef8ee90f4b3d7ebc570413d6a0a
     restart: unless-stopped
+    profiles:
+      - l4h
     cap_drop:
       - ALL
     ipc: none
@@ -142,6 +152,8 @@ services:
   fhir-server-for-azure:
     image: mcr.microsoft.com/healthcareapis/r4-fhir-server:3.0.63@sha256:10f4d2c2c412f027d02751f50931eb61258b0459eb7f7acd13eb718cdbfe2d14
     restart: unless-stopped
+    profiles:
+      - azure
     cap_drop:
       - ALL
     ipc: none
@@ -156,7 +168,7 @@ services:
       SqlServer__SchemaOptions__AutomaticUpdatesEnabled: "true"
       DataStore: "SqlServer"
     depends_on:
-      - sql
+      - fhir-server-for-azure-mssql-db
     labels:
       - "traefik.enable=true"
       - "traefik.http.services.azure-fhir.loadbalancer.server.port=8080"
@@ -165,6 +177,9 @@ services:
 
   fhir-server-for-azure-mssql-db:
     image: mcr.microsoft.com/mssql/server:2022-latest@sha256:85495b6c68b58a81a31d37f7e1e1d36384a75baf28bd2b16c77faa5905838126
+    restart: unless-stopped
+    profiles:
+      - azure
     ipc: private
     security_opt:
       - "no-new-privileges:true"
@@ -175,8 +190,19 @@ services:
 
   jaeger:
     image: docker.io/jaegertracing/all-in-one:1.37@sha256:60ab2e6b0682f79a4e42b2bd2526ac4de80a3a7a1ef136c71dc0cb85e9c50f46
+    restart: unless-stopped
+    cap_drop:
+      - ALL
+    ipc: none
+    security_opt:
+      - "no-new-privileges:true"
+    privileged: false
     ports:
-      - 127.0.0.1:16686:16686
       - 6831:6831/udp
       - 6832:6832/udp
       - 4317:4317/tcp
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.jaeger.loadbalancer.server.port=16686"
+      - "traefik.http.routers.jaeger.rule=Host(`jaeger.127.0.0.1.nip.io`)"
+      - "traefik.http.routers.jaeger.entrypoints=web"
