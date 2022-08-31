@@ -22,7 +22,7 @@ services:
           memory: 128m
 
   hapi-fhir-server:
-    image: docker.io/hapiproject/hapi:v6.0.1@sha256:63c98d8be3dadc77b47dca3115490f22bf99512f363f779f7bbcb42f569aeac3
+    image: docker.io/hapiproject/hapi:v6.1.0@sha256:253f87bb1f5b7627f8e25f76a4b0aa7a83f31968c6e111ad74d3cc4ad9ae812e
     restart: unless-stopped
     cap_drop:
       - ALL
@@ -75,7 +75,7 @@ services:
       POSTGRES_DB: fhir
 
   loader:
-    image: docker.io/curlimages/curl:7.84.0@sha256:5a2a25d96aa941ea2fc47acc50122f7c3d007399a075df61a82d6d2c3a567a2b
+    image: docker.io/curlimages/curl:7.85.0@sha256:9fab1b73f45e06df9506d947616062d7e8319009257d3a05d970b0de80a41ec5
     command: >
       sh -c "curl -X POST -H 'Content-Type:application/fhir+json' --retry-connrefuse --connect-timeout 30 --max-time 60 --retry 5 --retry-delay 15 --data '@/data/hospitalInformation1658779445044.json' ${FHIR_SERVER_URL} &&
              curl -X POST -H 'Content-Type:application/fhir+json' --retry-connrefuse --connect-timeout 30 --max-time 60 --retry 5 --retry-delay 15 --data '@/data/practitionerInformation1658779445044.json' ${FHIR_SERVER_URL} &&
@@ -140,7 +140,7 @@ services:
       - "traefik.http.routers.l4h-fhir.entrypoints=web"
 
   fhir-server-for-azure:
-    image: mcr.microsoft.com/healthcareapis/r4-fhir-server:3.0.47@sha256:8d8a95038b6e8f6bc8c81045a300a8f668ee90119b853085c0d8fbdeafa6be75
+    image: mcr.microsoft.com/healthcareapis/r4-fhir-server:3.0.63@sha256:10f4d2c2c412f027d02751f50931eb61258b0459eb7f7acd13eb718cdbfe2d14
     restart: unless-stopped
     cap_drop:
       - ALL
