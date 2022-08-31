@@ -23,7 +23,7 @@ deploy:
       - name: hapi-fhir-server
         repo: https://hapifhir.github.io/hapi-fhir-jpaserver-starter/
         remoteChart: hapi-fhir-jpaserver
-        version: 0.9.0
+        version: 0.10.1
         setValues:
           postgresql.auth.postgresPassword: secretpassword
         recreatePods: false

@@ -57,7 +57,7 @@ The basic structure and available configuration options is shown here:
 Start all prerequisite services for development by running:
 
 ```sh
-docker compose -f hack/docker-compose.yaml up
+docker compose -f hack/docker-compose.yaml --profile=l4h --profile=azure up
 ```
 
 This will start three FHIR servers and their corresponding databases. The servers are running behind Traefik as a
@@ -69,7 +69,8 @@ reverse proxy to provide nice URLs that are resolved to `localhost`:
 | [Linux4Health FHIR Server](https://github.com/LinuxForHealth/FHIR)                      | <http://l4h-fhir-server.127.0.0.1.nip.io/fhir-server/api/v4> |
 | [FHIR Server for Azure](https://github.com/microsoft/fhir-server)                       | <http://azure-fhir-server.127.0.0.1.nip.io/>                 |
 
-The HAPI FHIR JPA Server is pre-filled with sample Synthea data.
+The HAPI FHIR JPA Server is pre-filled with sample Synthea data. To only start the HAPI FHIR server, you can remove the `--profile=l4h --profile=azure` flags
+from the `docker compose` invocation.
 
 Install the packages and launch the server in [Hot-Reload mode](https://docs.microsoft.com/en-us/aspnet/core/test/hot-reload?view=aspnetcore-6.0):
 
