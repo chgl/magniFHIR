@@ -1,6 +1,6 @@
 services:
   traefik:
-    image: docker.io/library/traefik:v2.8.8@sha256:10e66d23decd4c522605aa022c8ec66b4c718ec84f77aa913690014dacf116d4
+    image: docker.io/library/traefik:v2.9.1@sha256:4ebf68cdb32ce65e8786ac83ece782ec0dbe583471c04dfd0af43f245b96c88f
     restart: unless-stopped
     ipc: none
     security_opt:
@@ -150,7 +150,7 @@ services:
       - "traefik.http.routers.l4h-fhir.entrypoints=web"
 
   fhir-server-for-azure:
-    image: mcr.microsoft.com/healthcareapis/r4-fhir-server:3.0.86@sha256:6184c446582dd7f96343fb3844596200d8313a79ad2b06d550390226bb3a92dc
+    image: mcr.microsoft.com/healthcareapis/r4-fhir-server:3.2.0@sha256:23c2d2b5d7edabbf92dc59783521ce50b15eb1f3bbaf0adc561470fd977147c4
     restart: unless-stopped
     profiles:
       - azure
