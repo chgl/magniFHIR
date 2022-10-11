@@ -6,7 +6,7 @@ ENV ASPNETCORE_URLS="http://+:8080;http://+:8081"
 USER 65532:65532
 CMD ["dotnet", "magniFHIR.dll"]
 
-FROM mcr.microsoft.com/dotnet/sdk:6.0.401-bullseye-slim@sha256:61b6b1075bb9058742b567dbc3070163c6fa8d1440335fa94280882de21fe3b1 AS build
+FROM mcr.microsoft.com/dotnet/sdk:6.0.401-bullseye-slim@sha256:37741f68682f5c69da8e805cdcf64d2279611e92b15edbaee87b819b12e9db29 AS build
 WORKDIR /build
 COPY magniFHIR.sln .
 COPY src/magniFHIR/magniFHIR.csproj src/magniFHIR/magniFHIR.csproj
