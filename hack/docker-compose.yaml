@@ -114,7 +114,7 @@ services:
       POSTGRES_DB: fhir
 
   fhir-schematool:
-    image: docker.io/ibmcom/ibm-fhir-schematool:4.11.1@sha256:e9a2b8ff795d4fdf9edd4d43cded87ac1d9bff6141b0a84e05c12a9a9043a315
+    image: docker.io/ibmcom/ibm-fhir-schematool:4.11.1@sha256:69e81658233494665d7b618e016954ded55455113294b97f162d35f93eb305e6
     restart: on-failure
     profiles:
       - l4h
