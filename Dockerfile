@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.4
-FROM mcr.microsoft.com/dotnet/aspnet:6.0.10-bullseye-slim@sha256:9e89c7ac0544f59d06e74b68e4147a74a1d3e8bf64d8d72df4829347c2c4ed1d AS base
+FROM mcr.microsoft.com/dotnet/aspnet:6.0.10-bullseye-slim@sha256:3117930715937a3b9f285f36b830184bbf16699325f16ea10c9bb5680b698321 AS base
 WORKDIR /app
 EXPOSE 8080/tcp 8081/tcp
 ENV ASPNETCORE_URLS="http://+:8080;http://+:8081"
