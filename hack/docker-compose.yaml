@@ -1,6 +1,6 @@
 services:
   traefik:
-    image: docker.io/library/traefik:v2.9.1@sha256:4ebf68cdb32ce65e8786ac83ece782ec0dbe583471c04dfd0af43f245b96c88f
+    image: docker.io/library/traefik:v2.9.4@sha256:4c388f477f5b7aa48420694d90db0ecb96b4ecede60b9b7589c87858abf87b60
     restart: unless-stopped
     ipc: none
     security_opt:
@@ -81,7 +81,7 @@ services:
       POSTGRES_DB: fhir
 
   loader:
-    image: docker.io/curlimages/curl:7.85.0@sha256:9fab1b73f45e06df9506d947616062d7e8319009257d3a05d970b0de80a41ec5
+    image: docker.io/curlimages/curl:7.86.0@sha256:cfdeba7f88bb85f6c87f2ec9135115b523a1c24943976a61fbf59c4f2eafd78e
     command: >
       sh -c "curl -X POST -H 'Content-Type:application/fhir+json' --retry-connrefuse --connect-timeout 30 --max-time 60 --retry 5 --retry-delay 15 --data '@/data/hospitalInformation1658779445044.json' http://hapi-fhir-server:8080/fhir &&
              curl -X POST -H 'Content-Type:application/fhir+json' --retry-connrefuse --connect-timeout 30 --max-time 60 --retry 5 --retry-delay 15 --data '@/data/practitionerInformation1658779445044.json' http://hapi-fhir-server:8080/fhir &&
@@ -114,7 +114,7 @@ services:
       POSTGRES_DB: fhir
 
   fhir-schematool:
-    image: docker.io/ibmcom/ibm-fhir-schematool:4.11.1@sha256:e9a2b8ff795d4fdf9edd4d43cded87ac1d9bff6141b0a84e05c12a9a9043a315
+    image: docker.io/ibmcom/ibm-fhir-schematool:4.11.1@sha256:69e81658233494665d7b618e016954ded55455113294b97f162d35f93eb305e6
     restart: on-failure
     profiles:
       - l4h
@@ -150,7 +150,7 @@ services:
       - "traefik.http.routers.l4h-fhir.entrypoints=web"
 
   fhir-server-for-azure:
-    image: mcr.microsoft.com/healthcareapis/r4-fhir-server:3.2.0@sha256:23c2d2b5d7edabbf92dc59783521ce50b15eb1f3bbaf0adc561470fd977147c4
+    image: mcr.microsoft.com/healthcareapis/r4-fhir-server:3.3.7@sha256:ed6538b6ea1cccb09f70615dcb92851d44536670e5688815df1f67a13072615c
     restart: unless-stopped
     profiles:
       - azure
