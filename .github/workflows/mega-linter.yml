@@ -35,7 +35,7 @@ jobs:
         id: ml
         # You can override MegaLinter flavor used to have faster performances
         # More info at https://oxsecurity.github.io/megalinter/flavors/
-        uses: oxsecurity/megalinter@f58627dfe556c4a85e53417f9b73ac505114d93b # tag=v6.13.0
+        uses: oxsecurity/megalinter@5f067f726ebba9ab0a05207777261d8254dd83a2 # v6.14.0
         env:
           # All available variables are described in documentation
           # https://oxsecurity.github.io/megalinter/configuration/

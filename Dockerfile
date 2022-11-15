@@ -1,12 +1,12 @@
 # syntax=docker/dockerfile:1.4
-FROM mcr.microsoft.com/dotnet/aspnet:6.0.10-bullseye-slim@sha256:3117930715937a3b9f285f36b830184bbf16699325f16ea10c9bb5680b698321 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:6.0.11-bullseye-slim@sha256:165383be8dc96734d5841f9c465ae8ddacb4896061a9f9eab9f67b0077883e25 AS base
 WORKDIR /app
 EXPOSE 8080/tcp 8081/tcp
 ENV ASPNETCORE_URLS="http://+:8080;http://+:8081"
 USER 65532:65532
 CMD ["dotnet", "magniFHIR.dll"]
 
-FROM mcr.microsoft.com/dotnet/sdk:6.0.402-bullseye-slim@sha256:ed3105b69dc4c1fbb638b672debbdd498f7beebb5159e4c5e27d7c910a32ccfe AS build
+FROM mcr.microsoft.com/dotnet/sdk:6.0.403-bullseye-slim@sha256:df73027d1ba103388b3ab14f00e7abde5b58ff68d1e9ff9ec82198af7f27232b AS build
 WORKDIR /build
 COPY magniFHIR.sln .
 COPY src/magniFHIR/magniFHIR.csproj src/magniFHIR/magniFHIR.csproj

@@ -96,7 +96,7 @@ services:
       - hapi-fhir-server
 
   l4h-fhir-db:
-    image: docker.io/library/postgres:14.5@sha256:f8816ada742348e1adfcec5c2a180b675bf6e4a294e0feb68bd70179451e1242
+    image: docker.io/library/postgres:14.6@sha256:c4932976fde9ca0b9a863fc551e4b3db67e707708a71a77c1f50cb846a9b6c2c
     restart: unless-stopped
     profiles:
       - l4h
@@ -195,7 +195,7 @@ services:
       ACCEPT_EULA: "Y"
 
   jaeger:
-    image: docker.io/jaegertracing/all-in-one:1.38@sha256:dc111a693eb22c38ea11a71b8303430a98efe04826049faab6f73dcf6ee9ad5d
+    image: docker.io/jaegertracing/all-in-one:1.39@sha256:2c610c909455dfd7eaa0361873e85a8a518c2e837f8800519b9798282439c998
     restart: unless-stopped
     cap_drop:
       - ALL
