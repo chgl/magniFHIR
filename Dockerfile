@@ -1,28 +1,40 @@
 # syntax=docker/dockerfile:1.4
-FROM mcr.microsoft.com/dotnet/aspnet:6.0.10-bullseye-slim@sha256:3117930715937a3b9f285f36b830184bbf16699325f16ea10c9bb5680b698321 AS base
-WORKDIR /app
+FROM mcr.microsoft.com/dotnet/nightly/aspnet:7.0-jammy-chiseled@sha256:c1350bc839492415f55f4dc6549533e4bad68ecdaf9976497a235eee18f89993 AS runtime
+WORKDIR /opt/magnifhir
 EXPOSE 8080/tcp 8081/tcp
-ENV ASPNETCORE_URLS="http://+:8080;http://+:8081"
 USER 65532:65532
-CMD ["dotnet", "magniFHIR.dll"]
+ENV DOTNET_ENVIRONMENT="Production" \
+    DOTNET_CLI_TELEMETRY_OPTOUT=1 \
+    ASPNETCORE_URLS="http://+:8080;http://+:8081"
+ENTRYPOINT ["dotnet", "/opt/magnifhir/magniFHIR.dll"]
 
-FROM mcr.microsoft.com/dotnet/sdk:6.0.402-bullseye-slim@sha256:ed3105b69dc4c1fbb638b672debbdd498f7beebb5159e4c5e27d7c910a32ccfe AS build
+FROM mcr.microsoft.com/dotnet/sdk:7.0-jammy@sha256:4099e5d6966436aa7cc37e9d2d5d0ab4b1e09abe9982d138a6a37f4ca696ce27 AS build
 WORKDIR /build
+ENV DOTNET_CLI_TELEMETRY_OPTOUT=1
+
 COPY magniFHIR.sln .
 COPY src/magniFHIR/magniFHIR.csproj src/magniFHIR/magniFHIR.csproj
 COPY src/magniFHIR.Tests/magniFHIR.Tests.csproj src/magniFHIR.Tests/magniFHIR.Tests.csproj
 
 RUN dotnet restore magniFHIR.sln
 
-FROM build AS publish-release
-COPY src/ src/
-ARG BUILD_VERSION=0.0.0
-RUN dotnet publish -p:Version=${BUILD_VERSION} --no-restore -c Release -o /out/release
+COPY . .
 
-FROM publish-release AS test
+RUN <<EOF
+dotnet build src/magniFHIR/magniFHIR.csproj \
+    --no-restore \
+    --configuration=Release
+
+dotnet publish src/magniFHIR/magniFHIR.csproj \
+    --no-restore \
+    --no-build \
+    --configuration=Release \
+    -o /build/publish
+EOF
+
+FROM build AS test
 RUN dotnet test src/magniFHIR.Tests/magniFHIR.Tests.csproj \
     --no-restore -p:CollectCoverage=true
 
-FROM base AS release
-ENV ASPNETCORE_ENVIRONMENT="Production"
-COPY --from=publish-release /out/release .
+FROM runtime
+COPY --from=build /build/publish .

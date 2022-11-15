@@ -22,7 +22,7 @@ services:
           memory: 128m
 
   hapi-fhir-server:
-    image: docker.io/hapiproject/hapi:v6.1.0@sha256:253f87bb1f5b7627f8e25f76a4b0aa7a83f31968c6e111ad74d3cc4ad9ae812e
+    image: index.docker.io/hapiproject/hapi:v6.1.0@sha256:253f87bb1f5b7627f8e25f76a4b0aa7a83f31968c6e111ad74d3cc4ad9ae812e
     restart: unless-stopped
     cap_drop:
       - ALL
@@ -65,7 +65,7 @@ services:
       - "traefik.http.routers.fhir.entrypoints=web"
 
   hapi-fhir-db:
-    image: docker.io/library/postgres:14.5@sha256:f8816ada742348e1adfcec5c2a180b675bf6e4a294e0feb68bd70179451e1242
+    image: index.docker.io/library/postgres:15.1@sha256:766e8867182b474f02e48c7b1a556d12ddfa246138ddc748d70c891bf2873d82
     restart: unless-stopped
     ipc: private
     security_opt:
@@ -81,7 +81,7 @@ services:
       POSTGRES_DB: fhir
 
   loader:
-    image: docker.io/curlimages/curl:7.86.0@sha256:cfdeba7f88bb85f6c87f2ec9135115b523a1c24943976a61fbf59c4f2eafd78e
+    image: index.docker.io/curlimages/curl:7.86.0@sha256:cfdeba7f88bb85f6c87f2ec9135115b523a1c24943976a61fbf59c4f2eafd78e
     command: >
       sh -c "curl -X POST -H 'Content-Type:application/fhir+json' --retry-connrefuse --connect-timeout 30 --max-time 60 --retry 5 --retry-delay 15 --data '@/data/hospitalInformation1658779445044.json' http://hapi-fhir-server:8080/fhir &&
              curl -X POST -H 'Content-Type:application/fhir+json' --retry-connrefuse --connect-timeout 30 --max-time 60 --retry 5 --retry-delay 15 --data '@/data/practitionerInformation1658779445044.json' http://hapi-fhir-server:8080/fhir &&
@@ -96,7 +96,7 @@ services:
       - hapi-fhir-server
 
   l4h-fhir-db:
-    image: docker.io/library/postgres:14.5@sha256:f8816ada742348e1adfcec5c2a180b675bf6e4a294e0feb68bd70179451e1242
+    image: docker.io/library/postgres:14.6@sha256:c4932976fde9ca0b9a863fc551e4b3db67e707708a71a77c1f50cb846a9b6c2c
     restart: unless-stopped
     profiles:
       - l4h
@@ -114,10 +114,16 @@ services:
       POSTGRES_DB: fhir
 
   fhir-schematool:
-    image: docker.io/ibmcom/ibm-fhir-schematool:4.11.1@sha256:69e81658233494665d7b618e016954ded55455113294b97f162d35f93eb305e6
+    image: ghcr.io/linuxforhealth/fhir-schematool:5.1.0@sha256:d9bef49171eb9b0f3b888b9cffa14fdf6baef24fc28b5d57af08ad8ed0ce95b3
     restart: on-failure
     profiles:
       - l4h
+    cap_drop:
+      - ALL
+    ipc: none
+    security_opt:
+      - "no-new-privileges:true"
+    privileged: false
     environment:
       ENV_SKIP: "false" # Set to true if you want to manage postgres schema yourself (or once schema is initialized)
     command: --tool.behavior=onboard --db.type=postgresql --db.host=l4h-fhir-db --db.port=5432 --db.database=fhir --sslConnection=false --grant.to=postgres --user=postgres --password=postgres
@@ -125,7 +131,7 @@ services:
       - l4h-fhir-db
 
   l4h-fhir-server:
-    image: docker.io/ibmcom/ibm-fhir-server:4.11.1@sha256:2433f739c48e4d8b087942d0f2df272d3d71cef8ee90f4b3d7ebc570413d6a0a
+    image: ghcr.io/linuxforhealth/fhir-server:5.1.0@sha256:f2790fbb724e504d541cd97d0ce70dae79891e71f31136e1c01526d0d0cc4877
     restart: unless-stopped
     profiles:
       - l4h
@@ -150,7 +156,7 @@ services:
       - "traefik.http.routers.l4h-fhir.entrypoints=web"
 
   fhir-server-for-azure:
-    image: mcr.microsoft.com/healthcareapis/r4-fhir-server:3.3.7@sha256:ed6538b6ea1cccb09f70615dcb92851d44536670e5688815df1f67a13072615c
+    image: mcr.microsoft.com/healthcareapis/r4-fhir-server:3.3.31@sha256:764612ad2656c6cb10baafdce9e04ad808105e000a111d3a8c478182feb3cf28
     restart: unless-stopped
     profiles:
       - azure
@@ -189,7 +195,7 @@ services:
       ACCEPT_EULA: "Y"
 
   jaeger:
-    image: docker.io/jaegertracing/all-in-one:1.38@sha256:dc111a693eb22c38ea11a71b8303430a98efe04826049faab6f73dcf6ee9ad5d
+    image: docker.io/jaegertracing/all-in-one:1.39@sha256:2c610c909455dfd7eaa0361873e85a8a518c2e837f8800519b9798282439c998
     restart: unless-stopped
     cap_drop:
       - ALL
