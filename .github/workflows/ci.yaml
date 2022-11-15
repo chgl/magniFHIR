@@ -8,13 +8,17 @@ on:
   pull_request:
     branches: [master]
 
+# Declare default permissions as read only.
+permissions: read-all
+
 jobs:
   build:
     name: Build
     runs-on: ubuntu-22.04
     permissions:
+      # used by cosign
       id-token: write
-      security-events: write
+      # used for pushing to ghcr.io
       packages: write
     steps:
       - name: Checkout code
