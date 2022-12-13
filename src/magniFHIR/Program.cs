@@ -8,6 +8,7 @@ using System.Net;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Prometheus;
 using OpenTelemetry.Resources;
+using OpenTelemetry;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,7 +19,7 @@ builder.Services.AddSingleton<IFhirService, FhirService>();
 builder.Services.AddSingleton(sp =>
 {
     var config = sp.GetService<IConfiguration>();
-    return config!.Get<FhirServersOptions>();
+    return config!.Get<FhirServersOptions>()!;
 });
 
 var serverOptions = builder.Configuration.Get<FhirServersOptions>();
@@ -52,7 +53,7 @@ if (isTracingEnabled)
     var tracingExporter = builder.Configuration.GetValue<string>("Tracing:Exporter").ToLowerInvariant();
     var serviceName = builder.Configuration.GetValue<string>("Tracing:ServiceName");
 
-    builder.Services.AddOpenTelemetryTracing(options =>
+    builder.Services.AddOpenTelemetry().WithTracing(options =>
     {
         options
             .ConfigureResource(r => r.AddService(

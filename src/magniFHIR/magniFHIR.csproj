@@ -4,6 +4,8 @@
     <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+
+    <Version>1.1.5</Version> <!-- x-release-please-version -->
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,7 +13,7 @@
     <PackageReference Include="MudBlazor" Version="6.1.5" />
     <PackageReference Include="OpenTelemetry.Exporter.Jaeger" Version="1.3.1" />
     <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.3.1" />
-    <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.0.0-rc9.9" />
+    <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.4.0-rc.1" />
     <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.0.0-rc9.10" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.0.0-rc9.10" />
     <PackageReference Include="Polly" Version="7.2.3" />
