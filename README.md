@@ -10,10 +10,10 @@ Visibility into your FHIR server.
 <!-- x-release-please-start-version -->
 
 ```sh
-docker run --rm -it -p 127.0.0.1:8080:8080 \
+docker run --rm -it -p 1.1.6.1:8080:8080 \
     -e FhirServers__0__Name="HAPI FHIR Test Server" \
     -e FhirServers__0__BaseUrl="https://hapi.fhir.org/baseR4" \
-    ghcr.io/chgl/magnifhir:v1.1.5
+    ghcr.io/chgl/magnifhir:v1.1.6
 ```
 
 <!-- x-release-please-end -->
