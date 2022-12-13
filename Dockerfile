@@ -8,7 +8,7 @@ ENV DOTNET_ENVIRONMENT="Production" \
     ASPNETCORE_URLS="http://+:8080;http://+:8081"
 ENTRYPOINT ["dotnet", "/opt/magnifhir/magniFHIR.dll"]
 
-FROM mcr.microsoft.com/dotnet/sdk:7.0-jammy@sha256:4099e5d6966436aa7cc37e9d2d5d0ab4b1e09abe9982d138a6a37f4ca696ce27 AS build
+FROM mcr.microsoft.com/dotnet/sdk:7.0-jammy@sha256:1f03f2609039c9172458f1172e4646032f1894fbc8e0cc6dfdfa5373348ae6cc AS build
 WORKDIR /build
 ENV DOTNET_CLI_TELEMETRY_OPTOUT=1
 
