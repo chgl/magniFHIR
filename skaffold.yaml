@@ -1,10 +1,8 @@
-apiVersion: skaffold/v2beta29
+apiVersion: skaffold/v3
 kind: Config
 metadata:
   name: magnifhir
 build:
-  local:
-    useBuildkit: true
   artifacts:
     - image: magnifhir
       context: .
@@ -14,24 +12,26 @@ build:
       context: hack/
       docker:
         dockerfile: hack/k8s/load-sample-data.Dockerfile
-deploy:
+  local:
+    useBuildkit: true
+manifests:
   kustomize:
     paths:
       - hack/k8s
   helm:
     releases:
       - name: hapi-fhir-server
-        repo: https://hapifhir.github.io/hapi-fhir-jpaserver-starter/
         remoteChart: hapi-fhir-jpaserver
-        version: 0.10.1
+        version: 0.11.0
         setValues:
           postgresql.auth.postgresPassword: secretpassword
-        recreatePods: false
-        skipBuildDependencies: false
-        useHelmSecrets: false
+        repo: https://hapifhir.github.io/hapi-fhir-jpaserver-starter/
+deploy:
+  helm: {}
+  kubectl: {}
 portForward:
   - resourceType: service
-    namespace: default
     resourceName: magnifhir
+    namespace: default
     port: 8080
     localPort: 8080
