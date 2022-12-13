@@ -1,6 +1,6 @@
 services:
   traefik:
-    image: docker.io/library/traefik:v2.9.4@sha256:4c388f477f5b7aa48420694d90db0ecb96b4ecede60b9b7589c87858abf87b60
+    image: docker.io/library/traefik:v2.9.6@sha256:bb7be8d50edf73d8d3a812ac8873ef354a0fe9b40d7f3880747b43a3525855d2
     restart: unless-stopped
     ipc: none
     security_opt:
@@ -22,7 +22,7 @@ services:
           memory: 128m
 
   hapi-fhir-server:
-    image: index.docker.io/hapiproject/hapi:v6.1.0@sha256:253f87bb1f5b7627f8e25f76a4b0aa7a83f31968c6e111ad74d3cc4ad9ae812e
+    image: index.docker.io/hapiproject/hapi:v6.2.2@sha256:9c4e8af94d81ac0049dbb589e4cd855bf78c9c13be6f6844e814c63d63545b44
     restart: unless-stopped
     cap_drop:
       - ALL
@@ -156,7 +156,7 @@ services:
       - "traefik.http.routers.l4h-fhir.entrypoints=web"
 
   fhir-server-for-azure:
-    image: mcr.microsoft.com/healthcareapis/r4-fhir-server:3.3.31@sha256:764612ad2656c6cb10baafdce9e04ad808105e000a111d3a8c478182feb3cf28
+    image: mcr.microsoft.com/healthcareapis/r4-fhir-server:3.3.53@sha256:ce5e0574d16ffce84caa915ae9d206caedab2aea1b62cb788e49fc2ee191f9ca
     restart: unless-stopped
     profiles:
       - azure
@@ -195,7 +195,7 @@ services:
       ACCEPT_EULA: "Y"
 
   jaeger:
-    image: docker.io/jaegertracing/all-in-one:1.39@sha256:2c610c909455dfd7eaa0361873e85a8a518c2e837f8800519b9798282439c998
+    image: docker.io/jaegertracing/all-in-one:1.40@sha256:fa8c1fc551ac31e161a7f729dbaf17e46aaccb0dbd5fbd772aeeb209802cb2a0
     restart: unless-stopped
     cap_drop:
       - ALL
