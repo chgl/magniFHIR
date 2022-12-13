@@ -1,0 +1,39 @@
+name: release-please
+
+on:
+  push:
+    branches:
+      - master
+
+permissions: read-all
+
+jobs:
+  release-please:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - uses: google-github-actions/release-please-action@2a4590f9c1d322790253d997de5cad7f7ad4bc1b # tag=v3.5.1
+        with:
+          token: ${{ secrets.SEMANTIC_RELEASE_TOKEN }}
+          release-type: simple
+          pull-request-title-pattern: "chore: release ${version}"
+          extra-files: |
+            src/magniFHIR/magniFHIR.csproj
+            README.md
+          changelog-types: |
+            [
+              { "type": "feat", "section": "Features" },
+              { "type": "fix", "section": "Bug Fixes" },
+              { "type": "perf", "section": "Performance Improvements" },
+              { "type": "docs", "section": "Documentation", "hidden": false },
+              {
+                "type": "chore",
+                "section": "Miscellaneous Chores",
+                "hidden": false
+              },
+              { "type": "build", "section": "Build", "hidden": false },
+              { "type": "ci", "section": "CI/CD", "hidden": false }
+            ]
