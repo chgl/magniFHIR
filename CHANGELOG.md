@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.1.7](https://github.com/chgl/magniFHIR/compare/v1.1.6...v1.1.7) (2022-12-13)
+
+
+### Miscellaneous Chores
+
+* fixed ci readme added security ([#57](https://github.com/chgl/magniFHIR/issues/57)) ([717c250](https://github.com/chgl/magniFHIR/commit/717c2507eca76916a73e62b3fc369474063f6209))
+
+
+### CI/CD
+
+* fix image name to be all lowercase and use GHA caching ([717c250](https://github.com/chgl/magniFHIR/commit/717c2507eca76916a73e62b3fc369474063f6209))
+
+
+### Documentation
+
+* added SECURITY.md ([717c250](https://github.com/chgl/magniFHIR/commit/717c2507eca76916a73e62b3fc369474063f6209))
+* fixed incorrectly updated 127.0.0.1... ([717c250](https://github.com/chgl/magniFHIR/commit/717c2507eca76916a73e62b3fc369474063f6209))
+
 ## [1.1.6](https://github.com/chgl/magniFHIR/compare/v1.1.5...v1.1.6) (2022-12-13)
 
 
