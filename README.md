@@ -1,15 +1,22 @@
 # magniFHIR
 
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/chgl/magniFHIR/badge)](https://api.securityscorecards.dev/projects/github.com/chgl/magniFHIR)
+[![SLSA 3](https://slsa.dev/images/gh-badge-level3.svg)](https://slsa.dev)
+
 Visibility into your FHIR server.
 
 ## Running
+
+<!-- x-release-please-start-version -->
 
 ```sh
 docker run --rm -it -p 127.0.0.1:8080:8080 \
     -e FhirServers__0__Name="HAPI FHIR Test Server" \
     -e FhirServers__0__BaseUrl="https://hapi.fhir.org/baseR4" \
-    ghcr.io/chgl/magnifhir:latest
+    ghcr.io/chgl/magnifhir:v1.1.5
 ```
+
+<!-- x-release-please-end -->
 
 Open <http://localhost:8080/> in your browser, select the `HAPI FHIR Test Server` in the server selection and click on `Patient Browser` in the left-hand menu.
 
