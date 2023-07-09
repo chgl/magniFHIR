@@ -16,13 +16,13 @@
 
         var cut = RenderComponent<PatientBrowser>(parameters => parameters.Add(p => p.FhirServerNameSlug, "test"));
 
-        var tableRows = cut.FindAll("table > tbody > tr");
+        var tableRows = cut.FindAll("th.mud-table-empty-row");
 
-        tableRows.Should().BeEmpty();
+        tableRows.Should().NotBeEmpty();
     }
 
     [Fact]
-    public void RendersEmptyRowWithPatientWithEvertythingUnset()
+    public void RendersEmptyRowWithPatientWithEverythingUnset()
     {
         var emptyPatient = new Patient();
         var bundle = new Bundle();
