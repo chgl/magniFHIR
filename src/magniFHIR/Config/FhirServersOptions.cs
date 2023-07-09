@@ -5,7 +5,8 @@ public class FhirServersOptions
 {
     public List<FhirServerConfig> FhirServers { get; init; } = new List<FhirServerConfig>();
 
-    public FhirServerConfig? FindByNameSlug(string slugName) => FhirServers.Find(s => s.NameSlug == slugName);
+    public FhirServerConfig? FindByNameSlug(string slugName) =>
+        FhirServers.Find(s => s.NameSlug == slugName);
 }
 
 public class FhirServerConfig
@@ -41,20 +42,23 @@ public class FhirServerConfig
         var normalizedTitle = value.Normalize(NormalizationForm.FormD);
         var slug = normalizedTitle
             .Where(c => CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
-            .Aggregate(new StringBuilder(), (sb, c) =>
-            {
-                if (char.IsLetterOrDigit(c))
+            .Aggregate(
+                new StringBuilder(),
+                (sb, c) =>
                 {
-                    return sb.Append(c);
-                }
+                    if (char.IsLetterOrDigit(c))
+                    {
+                        return sb.Append(c);
+                    }
 
-                if (char.IsWhiteSpace(c))
-                {
-                    return sb.Append('-');
-                }
+                    if (char.IsWhiteSpace(c))
+                    {
+                        return sb.Append('-');
+                    }
 
-                return sb.Append("");
-            });
+                    return sb.Append("");
+                }
+            );
 
         return slug.ToString().Trim().ToLowerInvariant();
     }

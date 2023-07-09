@@ -26,9 +26,10 @@ var serverOptions = builder.Configuration.Get<FhirServersOptions>();
 
 foreach (var server in serverOptions.FhirServers)
 {
-    var clientBuilder = builder.Services.AddHttpClient(server.NameSlug)
-            .SetHandlerLifetime(TimeSpan.FromMinutes(5))
-            .UseHttpClientMetrics();
+    var clientBuilder = builder.Services
+        .AddHttpClient(server.NameSlug)
+        .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+        .UseHttpClientMetrics();
 
     if (!string.IsNullOrEmpty(server.Auth?.Basic?.Username))
     {
@@ -37,7 +38,10 @@ foreach (var server in serverOptions.FhirServers)
             return new HttpClientHandler()
             {
                 UseDefaultCredentials = true,
-                Credentials = new NetworkCredential(server.Auth.Basic.Username, server.Auth.Basic.Password),
+                Credentials = new NetworkCredential(
+                    server.Auth.Basic.Username,
+                    server.Auth.Basic.Password
+                ),
             };
         });
     }
@@ -49,47 +53,58 @@ builder.Services.AddMudServices();
 var isTracingEnabled = builder.Configuration.GetValue<bool>("Tracing:Enabled");
 if (isTracingEnabled)
 {
-    var assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "unknown";
-    var tracingExporter = builder.Configuration.GetValue<string>("Tracing:Exporter").ToLowerInvariant();
+    var assemblyVersion =
+        Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "unknown";
+    var tracingExporter = builder.Configuration
+        .GetValue<string>("Tracing:Exporter")
+        .ToLowerInvariant();
     var serviceName = builder.Configuration.GetValue<string>("Tracing:ServiceName");
 
-    builder.Services.AddOpenTelemetry().WithTracing(options =>
-    {
-        options
-            .ConfigureResource(r => r.AddService(
-                serviceName: serviceName,
-                serviceVersion: assemblyVersion,
-                serviceInstanceId: Environment.MachineName))
-            .SetSampler(new AlwaysOnSampler())
-            .AddHttpClientInstrumentation()
-            .AddAspNetCoreInstrumentation(o =>
-            {
-                o.Filter = (r) =>
-                {
-                    var ignoredPaths = new[]
-                    {
-                            "/healthz",
-                            "/readyz",
-                            "/livez"
-                    };
-
-                    var path = r.Request.Path.Value;
-                    return !ignoredPaths.Any(path.Contains);
-                };
-            });
-
-        switch (tracingExporter)
+    builder.Services
+        .AddOpenTelemetry()
+        .WithTracing(options =>
         {
-            case "jaeger":
-                options.AddJaegerExporter();
-                builder.Services.Configure<JaegerExporterOptions>(builder.Configuration.GetSection("Tracing:Jaeger"));
-                break;
+            options
+                .ConfigureResource(
+                    r =>
+                        r.AddService(
+                            serviceName: serviceName,
+                            serviceVersion: assemblyVersion,
+                            serviceInstanceId: Environment.MachineName
+                        )
+                )
+                .SetSampler(new AlwaysOnSampler())
+                .AddHttpClientInstrumentation()
+                .AddAspNetCoreInstrumentation(o =>
+                {
+                    o.Filter = (r) =>
+                    {
+                        var ignoredPaths = new[] { "/healthz", "/readyz", "/livez" };
 
-            case "otlp":
-                options.AddOtlpExporter(otlpOptions => otlpOptions.Endpoint = new Uri(builder.Configuration.GetValue<string>("Tracing:Otlp:Endpoint")));
-                break;
-        }
-    });
+                        var path = r.Request.Path.Value;
+                        return !ignoredPaths.Any(path.Contains);
+                    };
+                });
+
+            switch (tracingExporter)
+            {
+                case "jaeger":
+                    options.AddJaegerExporter();
+                    builder.Services.Configure<JaegerExporterOptions>(
+                        builder.Configuration.GetSection("Tracing:Jaeger")
+                    );
+                    break;
+
+                case "otlp":
+                    options.AddOtlpExporter(
+                        otlpOptions =>
+                            otlpOptions.Endpoint = new Uri(
+                                builder.Configuration.GetValue<string>("Tracing:Otlp:Endpoint")
+                            )
+                    );
+                    break;
+            }
+        });
 }
 
 builder.Services.AddHealthChecks();
@@ -114,14 +129,8 @@ app.UseHttpMetrics();
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
 
-app.MapHealthChecks("/readyz", new HealthCheckOptions
-{
-    Predicate = _ => false
-});
+app.MapHealthChecks("/readyz", new HealthCheckOptions { Predicate = _ => false });
 
-app.MapHealthChecks("/livez", new HealthCheckOptions
-{
-    Predicate = _ => false
-});
+app.MapHealthChecks("/livez", new HealthCheckOptions { Predicate = _ => false });
 
 app.Run();

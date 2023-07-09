@@ -40,7 +40,9 @@
     {
       "type": "docker-build",
       "label": "docker-build: debug",
-      "dependsOn": ["build"],
+      "dependsOn": [
+        "build"
+      ],
       "dockerBuild": {
         "tag": "magnifhir:dev",
         "target": "base",
@@ -55,7 +57,9 @@
     {
       "type": "docker-build",
       "label": "docker-build: release",
-      "dependsOn": ["build"],
+      "dependsOn": [
+        "build"
+      ],
       "dockerBuild": {
         "tag": "magnifhir:latest",
         "dockerfile": "${workspaceFolder}/Dockerfile",
@@ -69,7 +73,9 @@
     {
       "type": "docker-run",
       "label": "docker-run: debug",
-      "dependsOn": ["docker-build: debug"],
+      "dependsOn": [
+        "docker-build: debug"
+      ],
       "dockerRun": {},
       "netCore": {
         "appProject": "${workspaceFolder}/src/magniFHIR/magniFHIR.csproj",
@@ -79,7 +85,9 @@
     {
       "type": "docker-run",
       "label": "docker-run: release",
-      "dependsOn": ["docker-build: release"],
+      "dependsOn": [
+        "docker-build: release"
+      ],
       "dockerRun": {},
       "netCore": {
         "appProject": "${workspaceFolder}/src/magniFHIR/magniFHIR.csproj"
