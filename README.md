@@ -64,7 +64,7 @@ The basic structure and available configuration options is shown here:
 Start all prerequisite services for development by running:
 
 ```sh
-docker compose -f hack/docker-compose.yaml --profile=l4h --profile=azure up
+docker compose -f hack/compose.yaml --profile=l4h --profile=azure up
 ```
 
 This will start three FHIR servers and their corresponding databases. The servers are running behind Traefik as a
@@ -82,7 +82,7 @@ from the `docker compose` invocation.
 Install the packages and launch the server in [Hot-Reload mode](https://docs.microsoft.com/en-us/aspnet/core/test/hot-reload?view=aspnetcore-6.0):
 
 ```sh
-dotnet restore magniFHIR.sln
+dotnet restore
 dotnet watch --project=src/magniFHIR
 ```
 
