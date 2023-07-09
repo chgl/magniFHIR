@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.2.0](https://github.com/chgl/magniFHIR/compare/v1.1.7...v1.2.0) (2023-07-09)
+
+
+### Features
+
+* added paging to patient browser ([#69](https://github.com/chgl/magniFHIR/issues/69)) ([c7d456a](https://github.com/chgl/magniFHIR/commit/c7d456a44b662222123741fed025b96da782ad83))
+
+
+### Miscellaneous Chores
+
+* **deps:** update actions/checkout digest to 8e5e7e5 ([#59](https://github.com/chgl/magniFHIR/issues/59)) ([863cf07](https://github.com/chgl/magniFHIR/commit/863cf073f7bbebc3d765de416f8b251c15cfc274))
+* **deps:** update actions/checkout digest to c85c95e ([#66](https://github.com/chgl/magniFHIR/issues/66)) ([de1344e](https://github.com/chgl/magniFHIR/commit/de1344edbddc7f690120abe677a553d746b8b7bc))
+* **deps:** update actions/setup-dotnet digest to 3447fd6 ([#63](https://github.com/chgl/magniFHIR/issues/63)) ([d6eee4b](https://github.com/chgl/magniFHIR/commit/d6eee4b1847e0ee59c923c00b4981923f013665b))
+* **deps:** update actions/upload-artifact digest to 0b7f8ab ([#61](https://github.com/chgl/magniFHIR/issues/61)) ([083dfb5](https://github.com/chgl/magniFHIR/commit/083dfb565aaefd20543c60a1b4e3e6db14b5712f))
+* **deps:** update amannn/action-semantic-pull-request digest to c3cd5d1 ([#64](https://github.com/chgl/magniFHIR/issues/64)) ([2e0710f](https://github.com/chgl/magniFHIR/commit/2e0710f1bb27ea43f89f8fe77c4987c67b9aa0d7))
+* **deps:** update docker.io/library/postgres:14.6 docker digest to f565573 ([#60](https://github.com/chgl/magniFHIR/issues/60)) ([ba1c847](https://github.com/chgl/magniFHIR/commit/ba1c847a5f908452a5b105cfbb8093f7e3a7304c))
+* **deps:** update docker.io/library/traefik:v2.9.6 docker digest to 0390292 ([#67](https://github.com/chgl/magniFHIR/issues/67)) ([564aa7b](https://github.com/chgl/magniFHIR/commit/564aa7b3e0b3b3293f2a12432d4111609e01f8d5))
+* **deps:** update docker/build-push-action digest to 1104d47 ([#62](https://github.com/chgl/magniFHIR/issues/62)) ([3b02137](https://github.com/chgl/magniFHIR/commit/3b0213761de4a9b450a539be8c9fb136e7e82405))
+
 ## [1.1.7](https://github.com/chgl/magniFHIR/compare/v1.1.6...v1.1.7) (2022-12-13)
 
 ### Miscellaneous Chores
