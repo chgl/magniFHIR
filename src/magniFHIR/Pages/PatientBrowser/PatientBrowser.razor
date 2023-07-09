@@ -8,60 +8,68 @@
 
 <MudText Typo="Typo.h3" GutterBottom="true">Patient Browser</MudText>
 
-<MudAlert Severity="Severity.Warning">
-    This browser currently only supports loading a single bundle of Patient resources ordered by their
-    <code>meta.lastUpdated</code> field.
-</MudAlert>
-
-
-@if (patients is null)
-{
-    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
-}
-else
-{
-    <MudTable Dense="true" Items="@patients" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
-        <HeaderContent>
-            <MudTh>Name</MudTh>
-            <MudTh>Birth Date</MudTh>
-            <MudTh>Gender</MudTh>
-            <MudTh>MRN</MudTh>
-            <MudTh>Id</MudTh>
-            <MudTh>Last Updated</MudTh>
-            <MudTh>Patient Record</MudTh>
-        </HeaderContent>
-        <RowTemplate>
-            <MudTd DataLabel="Name">@context.DisplayName()</MudTd>
-            <MudTd DataLabel="BirthDate">@context.BirthDate</MudTd>
-            <MudTd DataLabel="Gender">@context.Gender</MudTd>
-            <MudTd DataLabel="MRN">@(string.Join(", ", context.MedicalRecordNumbers()))</MudTd>
-                <MudTd DataLabel="Id">@context.Id</MudTd>
-                <MudTd DataLabel="LastUpdated">@context.Meta?.LastUpdated</MudTd>
-                <MudTd>
-                    <MudButton Size="Size.Small" Variant="Variant.Outlined" Color="Color.Secondary"
-                       EndIcon="@Icons.Material.Filled.ContactPage"
-                       Href="@($"/servers/{FhirServerNameSlug}/patients/{context.Id}")" Target="_blank">
-                        View Record
-                    </MudButton>
-                </MudTd>
-            </RowTemplate>
-        </MudTable>
-}
+<MudTable Dense="true" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info" ServerData="@(new Func<TableState, Task<TableData<Patient>>>(ServerReload))" >
+    <HeaderContent>
+        <MudTh>Name</MudTh>
+        <MudTh>Birth Date</MudTh>
+        <MudTh>Gender</MudTh>
+        <MudTh>MRN</MudTh>
+        <MudTh>Id</MudTh>
+        <MudTh>Last Updated</MudTh>
+        <MudTh>Patient Record</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Name">@context.DisplayName()</MudTd>
+        <MudTd DataLabel="BirthDate">@context.BirthDate</MudTd>
+        <MudTd DataLabel="Gender">@context.Gender</MudTd>
+        <MudTd DataLabel="MRN">@(string.Join(", ", context.MedicalRecordNumbers()))</MudTd>
+            <MudTd DataLabel="Id">@context.Id</MudTd>
+            <MudTd DataLabel="LastUpdated">@context.Meta?.LastUpdated</MudTd>
+            <MudTd>
+                <MudButton Size="Size.Small" Variant="Variant.Outlined" Color="Color.Secondary"
+                    EndIcon="@Icons.Material.Filled.ContactPage"
+                    Href="@($"/servers/{FhirServerNameSlug}/patients/{context.Id}")" Target="_blank">
+                    View Record
+                </MudButton>
+            </MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        <MudText>No matching records found</MudText>
+    </NoRecordsContent>
+    <LoadingContent>
+        <MudText>Loading...</MudText>
+    </LoadingContent>
+    <PagerContent>
+        <MudTablePager HideRowsPerPage="true" HidePageNumber="true" LastIcon="null" FirstIcon="null" BeforeIcon="null"/>
+    </PagerContent>
+</MudTable>
 
 @code {
     [Parameter]
     public string? FhirServerNameSlug { get; set; }
-    private List<Patient>? patients;
+    private Bundle? currentPage = null;
 
-    protected override async System.Threading.Tasks.Task OnInitializedAsync()
+    private async Task<TableData<Patient>> ServerReload(TableState state)
     {
         if (FhirServerNameSlug is null)
         {
             throw new InvalidOperationException("Requested patient browser without server name set.");
         }
 
-        var bundle = await FhirService.GetPatientsAsync(FhirServerNameSlug);
+        var bundle = await FhirService.GetPatientsAsync(FhirServerNameSlug, currentPage);
 
-        patients = bundle.Entry.Select(entry => entry.Resource).Cast<Patient>().ToList();
+        currentPage = bundle;
+
+        var patients = bundle.Entry.Select(entry => entry.Resource).Cast<Patient>().ToList();
+
+        var totalItems = int.MaxValue;
+        if (bundle.NextLink is null)
+        {
+            // if there are no more pages after this one, we disable the next button
+            // by setting the totalItems to the number of items returned.
+            totalItems = patients.Count;
+        }
+
+        return new TableData<Patient>() {Items = patients, TotalItems = totalItems};
     }
 }

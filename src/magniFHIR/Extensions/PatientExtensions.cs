@@ -7,7 +7,9 @@ public static class PatientExtensions
 
     public static string DisplayName(this Patient @this)
     {
-        var name = @this.Name.Find(name => name.Use == HumanName.NameUse.Usual) ?? @this.Name.FirstOrDefault();
+        var name =
+            @this.Name.Find(name => name.Use == HumanName.NameUse.Usual)
+            ?? @this.Name.FirstOrDefault();
         if (name is null)
         {
             return "N/A";
@@ -19,8 +21,13 @@ public static class PatientExtensions
     public static IEnumerable<string> MedicalRecordNumbers(this Patient @this)
     {
         return @this.Identifier
-            .Where(id => id.Type?.Coding?.Any(coding => coding.System == IdentifierTypeSystem &&
-                                                        coding.Code == IdentifierTypeMR) ?? false)
+            .Where(
+                id =>
+                    id.Type?.Coding?.Any(
+                        coding =>
+                            coding.System == IdentifierTypeSystem && coding.Code == IdentifierTypeMR
+                    ) ?? false
+            )
             .Select(id => id.Value);
     }
 }

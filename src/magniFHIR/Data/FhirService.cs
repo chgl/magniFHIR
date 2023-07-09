@@ -7,11 +7,19 @@ namespace magniFHIR.Data
     {
         Task<Bundle> GetPatientsAsync(string serverNameSlug);
         Task<Patient?> GetPatientsByIdAsync(string serverNameSlug, string resourceId);
-        Task<List<TResource>> GetResourcesByPatientIdAsync<TResource>(string serverNameSlug, string patientResourceId, string orderBy = "_lastUpdated") where TResource : Resource;
+        Task<List<TResource>> GetResourcesByPatientIdAsync<TResource>(
+            string serverNameSlug,
+            string patientResourceId,
+            string orderBy = "_lastUpdated"
+        )
+            where TResource : Resource;
+
+        Task<Bundle> GetPatientsAsync(string serverNameSlug, Bundle? currentPage = null);
     }
 
     public class FhirService : IFhirService
     {
+        private readonly ILogger<FhirService> logger;
         private readonly IHttpClientFactory clientFactory;
         private readonly FhirServersOptions serversOptions;
         private readonly FhirClientSettings clientSettings;
@@ -26,26 +34,65 @@ namespace magniFHIR.Data
             };
         }
 
+        // TODO: instead of using serverName everywhere, create a FhirServiceFactory
+        //       which internally manages FhirService instances with a HTTP/FHIR client
+        //       already set.
         public Task<Bundle> GetPatientsAsync(string serverNameSlug)
         {
             var fhirClient = GetFhirClientFromServerNameSlug(serverNameSlug);
 
-            var sp = new SearchParams()
-                .OrderBy("_lastUpdated", SortOrder.Descending);
+            var sp = new SearchParams().OrderBy("_lastUpdated", SortOrder.Descending);
             return fhirClient.SearchAsync<Patient>(sp);
         }
 
-        public async Task<List<TResource>> GetResourcesByPatientIdAsync<TResource>(string serverNameSlug, string patientResourceId, string orderBy = "_lastUpdated") where TResource : Resource
+        public async Task<Bundle> GetPatientsAsync(
+            string serverNameSlug,
+            Bundle? currentPage = null
+        )
+        {
+            var fhirClient = GetFhirClientFromServerNameSlug(serverNameSlug);
+
+            var serverOptions = serversOptions.FindByNameSlug(serverNameSlug);
+
+            var pageSize = serverOptions?.ResourceBrowsers[ResourceType.Patient].PageSize ?? 5;
+
+            Bundle results;
+            if (currentPage is not null)
+            {
+                results = await fhirClient.ContinueAsync(currentPage, PageDirection.Next);
+            }
+            else
+            {
+                var sp = new SearchParams()
+                    .OrderBy("_lastUpdated", SortOrder.Descending)
+                    .LimitTo(pageSize);
+                results = await fhirClient.SearchAsync<Patient>(sp);
+            }
+
+            return results;
+        }
+
+        public async Task<List<TResource>> GetResourcesByPatientIdAsync<TResource>(
+            string serverNameSlug,
+            string patientResourceId,
+            string orderBy = "_lastUpdated"
+        )
+            where TResource : Resource
         {
             var fhirClient = GetFhirClientFromServerNameSlug(serverNameSlug);
 
             var resultList = new List<TResource>();
-            var sp = new SearchParams("subject", $"Patient/{patientResourceId}").OrderBy(orderBy, SortOrder.Descending);
+            var sp = new SearchParams("subject", $"Patient/{patientResourceId}").OrderBy(
+                orderBy,
+                SortOrder.Descending
+            );
             var resultBundle = await fhirClient.SearchAsync<TResource>(sp);
 
             while (resultBundle != null)
             {
-                resultList.AddRange(resultBundle.Entry.Select(entry => entry.Resource).Cast<TResource>());
+                resultList.AddRange(
+                    resultBundle.Entry.Select(entry => entry.Resource).Cast<TResource>()
+                );
                 resultBundle = await fhirClient.ContinueAsync(resultBundle);
             }
 
@@ -74,13 +121,11 @@ namespace magniFHIR.Data
 
         private FhirClient GetFhirClientFromServerNameSlug(string serverNameSlug)
         {
-            var serverConfig = serversOptions.FindByNameSlug(serverNameSlug);
-
-            if (serverConfig is null)
-            {
-                throw new InvalidOperationException($"No server found with name '{serverNameSlug}' in config.");
-            }
-
+            var serverConfig =
+                serversOptions.FindByNameSlug(serverNameSlug)
+                ?? throw new InvalidOperationException(
+                    $"No server found with name '{serverNameSlug}' in config."
+                );
             var httpClient = clientFactory.CreateClient(serverNameSlug);
             return new FhirClient(serverConfig.BaseUrl, httpClient, clientSettings);
         }

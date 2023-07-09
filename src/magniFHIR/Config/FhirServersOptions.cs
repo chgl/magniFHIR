@@ -1,11 +1,13 @@
 using System.Globalization;
 using System.Text;
+using Hl7.Fhir.Model;
 
 public class FhirServersOptions
 {
     public List<FhirServerConfig> FhirServers { get; init; } = new List<FhirServerConfig>();
 
-    public FhirServerConfig? FindByNameSlug(string slugName) => FhirServers.Find(s => s.NameSlug == slugName);
+    public FhirServerConfig? FindByNameSlug(string slugName) =>
+        FhirServers.Find(s => s.NameSlug == slugName);
 }
 
 public class FhirServerConfig
@@ -14,6 +16,16 @@ public class FhirServerConfig
     public Uri? BaseUrl { get; init; }
     public string? NameSlug => Slugify(Name);
     public FhirServerAuthConfig? Auth { get; set; }
+    public IDictionary<ResourceType, ResourceBrowserConfig> ResourceBrowsers { get; set; }
+
+    public FhirServerConfig()
+    {
+        ResourceBrowsers = new Dictionary<ResourceType, ResourceBrowserConfig>();
+        foreach (var resourceType in Enum.GetValues<ResourceType>())
+        {
+            ResourceBrowsers.Add(resourceType, new ResourceBrowserConfig());
+        }
+    }
 
     public override string ToString()
     {
@@ -41,20 +53,23 @@ public class FhirServerConfig
         var normalizedTitle = value.Normalize(NormalizationForm.FormD);
         var slug = normalizedTitle
             .Where(c => CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
-            .Aggregate(new StringBuilder(), (sb, c) =>
-            {
-                if (char.IsLetterOrDigit(c))
+            .Aggregate(
+                new StringBuilder(),
+                (sb, c) =>
                 {
-                    return sb.Append(c);
-                }
+                    if (char.IsLetterOrDigit(c))
+                    {
+                        return sb.Append(c);
+                    }
 
-                if (char.IsWhiteSpace(c))
-                {
-                    return sb.Append('-');
-                }
+                    if (char.IsWhiteSpace(c))
+                    {
+                        return sb.Append('-');
+                    }
 
-                return sb.Append("");
-            });
+                    return sb.Append("");
+                }
+            );
 
         return slug.ToString().Trim().ToLowerInvariant();
     }
@@ -74,4 +89,9 @@ public class FhirServerBasicAuthConfig
 {
     public string? Username { get; set; }
     public string? Password { get; set; }
+}
+
+public class ResourceBrowserConfig
+{
+    public int PageSize { get; set; } = 50;
 }

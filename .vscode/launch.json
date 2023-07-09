@@ -6,7 +6,7 @@
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build",
-      "program": "${workspaceFolder}/src/magniFHIR/bin/Debug/net6.0/magniFHIR.dll",
+      "program": "${workspaceFolder}/src/magniFHIR/bin/Debug/net7.0/magniFHIR.dll",
       "args": [],
       "cwd": "${workspaceFolder}/src/magniFHIR",
       "stopAtEntry": false,
