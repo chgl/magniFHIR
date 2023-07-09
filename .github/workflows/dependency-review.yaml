@@ -10,6 +10,6 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: "Checkout Repository"
-        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3
+        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3
       - name: "Dependency Review"
         uses: actions/dependency-review-action@0efb1d1d84fc9633afcdaad14c485cbbc90ef46c # v2
