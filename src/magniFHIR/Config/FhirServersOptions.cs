@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text;
+using Hl7.Fhir.Model;
 
 public class FhirServersOptions
 {
@@ -15,6 +16,16 @@ public class FhirServerConfig
     public Uri? BaseUrl { get; init; }
     public string? NameSlug => Slugify(Name);
     public FhirServerAuthConfig? Auth { get; set; }
+    public IDictionary<ResourceType, ResourceBrowserConfig> ResourceBrowsers { get; set; }
+
+    public FhirServerConfig()
+    {
+        ResourceBrowsers = new Dictionary<ResourceType, ResourceBrowserConfig>();
+        foreach (var resourceType in Enum.GetValues<ResourceType>())
+        {
+            ResourceBrowsers.Add(resourceType, new ResourceBrowserConfig());
+        }
+    }
 
     public override string ToString()
     {
@@ -78,4 +89,9 @@ public class FhirServerBasicAuthConfig
 {
     public string? Username { get; set; }
     public string? Password { get; set; }
+}
+
+public class ResourceBrowserConfig
+{
+    public int PageSize { get; set; } = 50;
 }

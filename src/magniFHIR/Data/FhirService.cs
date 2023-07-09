@@ -13,10 +13,13 @@ namespace magniFHIR.Data
             string orderBy = "_lastUpdated"
         )
             where TResource : Resource;
+
+        Task<Bundle> GetPatientsAsync(string serverNameSlug, Bundle? currentPage = null);
     }
 
     public class FhirService : IFhirService
     {
+        private readonly ILogger<FhirService> logger;
         private readonly IHttpClientFactory clientFactory;
         private readonly FhirServersOptions serversOptions;
         private readonly FhirClientSettings clientSettings;
@@ -40,6 +43,33 @@ namespace magniFHIR.Data
 
             var sp = new SearchParams().OrderBy("_lastUpdated", SortOrder.Descending);
             return fhirClient.SearchAsync<Patient>(sp);
+        }
+
+        public async Task<Bundle> GetPatientsAsync(
+            string serverNameSlug,
+            Bundle? currentPage = null
+        )
+        {
+            var fhirClient = GetFhirClientFromServerNameSlug(serverNameSlug);
+
+            var serverOptions = serversOptions.FindByNameSlug(serverNameSlug);
+
+            var pageSize = serverOptions?.ResourceBrowsers[ResourceType.Patient].PageSize ?? 5;
+
+            Bundle results;
+            if (currentPage is not null)
+            {
+                results = await fhirClient.ContinueAsync(currentPage, PageDirection.Next);
+            }
+            else
+            {
+                var sp = new SearchParams()
+                    .OrderBy("_lastUpdated", SortOrder.Descending)
+                    .LimitTo(pageSize);
+                results = await fhirClient.SearchAsync<Patient>(sp);
+            }
+
+            return results;
         }
 
         public async Task<List<TResource>> GetResourcesByPatientIdAsync<TResource>(
@@ -91,15 +121,11 @@ namespace magniFHIR.Data
 
         private FhirClient GetFhirClientFromServerNameSlug(string serverNameSlug)
         {
-            var serverConfig = serversOptions.FindByNameSlug(serverNameSlug);
-
-            if (serverConfig is null)
-            {
-                throw new InvalidOperationException(
+            var serverConfig =
+                serversOptions.FindByNameSlug(serverNameSlug)
+                ?? throw new InvalidOperationException(
                     $"No server found with name '{serverNameSlug}' in config."
                 );
-            }
-
             var httpClient = clientFactory.CreateClient(serverNameSlug);
             return new FhirClient(serverConfig.BaseUrl, httpClient, clientSettings);
         }
