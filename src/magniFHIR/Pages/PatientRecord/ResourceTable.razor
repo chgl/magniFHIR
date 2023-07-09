@@ -1,0 +1,24 @@
+@using Hl7.Fhir.Model
+@using magniFHIR.Config;
+
+<MudTable Dense="true" Items="@Resources" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
+    <HeaderContent>
+        @foreach (var column in Config.Columns)
+        {
+            <MudTh>@column.Header</MudTh>
+        }
+    </HeaderContent>
+    <RowTemplate>
+        @foreach (var column in Config.Columns)
+        {
+            <MudTd>@column.Path</MudTd>
+        }
+    </RowTemplate>
+</MudTable>
+
+@code {
+    [Parameter]
+    public ResourceBrowserConfig? Config { get; set; }
+
+    public List<Resource> Resources { get; set; } = new();
+}

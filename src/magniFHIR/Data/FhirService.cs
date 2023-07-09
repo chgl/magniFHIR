@@ -1,5 +1,6 @@
 using Hl7.Fhir.Model;
 using Hl7.Fhir.Rest;
+using magniFHIR.Config;
 
 namespace magniFHIR.Data
 {
@@ -22,15 +23,20 @@ namespace magniFHIR.Data
         private readonly ILogger<FhirService> logger;
         private readonly IHttpClientFactory clientFactory;
         private readonly FhirServersOptions serversOptions;
+        private readonly ResourceBrowsersOptions browsersOptions;
         private readonly FhirClientSettings clientSettings;
 
-        public FhirService(IHttpClientFactory clientFactory, FhirServersOptions serversOptions)
+        public FhirService(IHttpClientFactory clientFactory, FhirServersOptions serversOptions, ResourceBrowsersOptions browsersOptions)
         {
             this.clientFactory = clientFactory;
             this.serversOptions = serversOptions;
+            this.browsersOptions = browsersOptions;
             this.clientSettings = new FhirClientSettings()
             {
                 PreferredFormat = ResourceFormat.Json,
+                CompressRequestBody = true,
+                PreferCompressedResponses = true,
+                UseFhirVersionInAcceptHeader = true,
             };
         }
 
@@ -52,9 +58,7 @@ namespace magniFHIR.Data
         {
             var fhirClient = GetFhirClientFromServerNameSlug(serverNameSlug);
 
-            var serverOptions = serversOptions.FindByNameSlug(serverNameSlug);
-
-            var pageSize = serverOptions?.ResourceBrowsers[ResourceType.Patient].PageSize ?? 5;
+            var pageSize = browsersOptions.ResourceBrowsers[ResourceType.Patient].PageSize;
 
             Bundle results;
             if (currentPage is not null)

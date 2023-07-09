@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Prometheus;
 using OpenTelemetry.Resources;
 using OpenTelemetry;
+using magniFHIR.Config;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +21,12 @@ builder.Services.AddSingleton(sp =>
 {
     var config = sp.GetService<IConfiguration>();
     return config!.Get<FhirServersOptions>()!;
+});
+
+builder.Services.AddSingleton(sp =>
+{
+    var config = sp.GetService<IConfiguration>();
+    return config!.Get<ResourceBrowsersOptions>()!;
 });
 
 var serverOptions = builder.Configuration.Get<FhirServersOptions>();
