@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/chgl/magniFHIR/compare/v1.2.0...v1.3.0) (2023-07-10)
+
+
+### Features
+
+* added ability to configure custom resource browsers  ([#70](https://github.com/chgl/magniFHIR/issues/70)) ([cf906fe](https://github.com/chgl/magniFHIR/commit/cf906fee71b6a58b7ea0f5da43cd315ddc2b2fa1))
+
 ## [1.2.0](https://github.com/chgl/magniFHIR/compare/v1.1.7...v1.2.0) (2023-07-09)
 
 
