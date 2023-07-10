@@ -1,8 +1,10 @@
 @page "/servers/{fhirServerNameSlug}/patients/{patientId?}"
 @using Hl7.Fhir.Model
 @using magniFHIR.Data
+@using magniFHIR.Config
 @inject NavigationManager NavigationManager
 @inject IFhirService FhirService
+@inject ResourceBrowsersOptions BrowsersOptions;
 
 <PageTitle>Patient Record</PageTitle>
 
@@ -15,16 +17,16 @@
     <PatientCard Patient="@FoundPatient" />
 }
 
-<MudTabs Outlined="true" Rounded="true" Border="true" ApplyEffectsToContainer="true" Class="mt-8" PanelClass="pa-6">
-    <MudTabPanel Text="Conditions" Icon="@Icons.Filled.Coronavirus">
-        <ConditionTable Conditions="@Conditions" />
-    </MudTabPanel>
-    <MudTabPanel Text="Observations" Icon="@Icons.Filled.Biotech">
-        <ObservationTable Observations="@Observations" />
-    </MudTabPanel>
-    <MudTabPanel Text="Medications" Icon="@Icons.Filled.Medication">
-        <MudAlert Severity="Severity.Info">Coming Soon...</MudAlert>
-    </MudTabPanel>
+<MudTabs Outlined="true" Position="Position.Left" Rounded="true" Border="true"
+         ApplyEffectsToContainer="true" Class="mt-8" PanelClass="pa-6">
+    @foreach (var resourceKey in BrowsersOptions.ResourceBrowsers.Keys.Where(type => type != ResourceType.Patient))
+    {
+        var config = BrowsersOptions.ResourceBrowsers[resourceKey];
+
+        <MudTabPanel Text="@resourceKey.ToString()">
+            <ResourceTable Config="@config" ResourceType="@resourceKey" PatientId="@SearchedForPatientId" FhirServerNameSlug="@FhirServerNameSlug" />
+        </MudTabPanel>
+    }
 </MudTabs>
 
 @code {
@@ -34,8 +36,6 @@
     public string? PatientId { get; set; }
     public string? SearchedForPatientId { get; set; }
     public Patient? FoundPatient { get; set; }
-    public List<Condition>? Conditions { get; set; }
-    public List<Observation>? Observations { get; set; }
 
     protected async override System.Threading.Tasks.Task OnParametersSetAsync()
     {
@@ -44,16 +44,6 @@
         if (SearchedForPatientId is not null && FhirServerNameSlug is not null)
         {
             FoundPatient = await FhirService.GetPatientsByIdAsync(FhirServerNameSlug, SearchedForPatientId);
-
-            Conditions = await FhirService.GetResourcesByPatientIdAsync<Condition>(
-            FhirServerNameSlug,
-            SearchedForPatientId,
-            "recorded-date");
-
-            Observations = await FhirService.GetResourcesByPatientIdAsync<Observation>(
-            FhirServerNameSlug,
-            SearchedForPatientId,
-            "date");
         }
     }
 

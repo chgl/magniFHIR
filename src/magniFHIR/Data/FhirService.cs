@@ -6,27 +6,30 @@ namespace magniFHIR.Data
 {
     public interface IFhirService
     {
-        Task<Bundle> GetPatientsAsync(string serverNameSlug);
         Task<Patient?> GetPatientsByIdAsync(string serverNameSlug, string resourceId);
-        Task<List<TResource>> GetResourcesByPatientIdAsync<TResource>(
-            string serverNameSlug,
-            string patientResourceId,
-            string orderBy = "_lastUpdated"
-        )
-            where TResource : Resource;
 
         Task<Bundle> GetPatientsAsync(string serverNameSlug, Bundle? currentPage = null);
+
+        Task<Bundle> GetResourcesByPatientIdAsync(
+            string serverNameSlug,
+            string patientResourceId,
+            ResourceType resourceType,
+            Bundle? currentPage = null
+        );
     }
 
     public class FhirService : IFhirService
     {
-        private readonly ILogger<FhirService> logger;
         private readonly IHttpClientFactory clientFactory;
         private readonly FhirServersOptions serversOptions;
         private readonly ResourceBrowsersOptions browsersOptions;
         private readonly FhirClientSettings clientSettings;
 
-        public FhirService(IHttpClientFactory clientFactory, FhirServersOptions serversOptions, ResourceBrowsersOptions browsersOptions)
+        public FhirService(
+            IHttpClientFactory clientFactory,
+            FhirServersOptions serversOptions,
+            ResourceBrowsersOptions browsersOptions
+        )
         {
             this.clientFactory = clientFactory;
             this.serversOptions = serversOptions;
@@ -34,23 +37,12 @@ namespace magniFHIR.Data
             this.clientSettings = new FhirClientSettings()
             {
                 PreferredFormat = ResourceFormat.Json,
-                CompressRequestBody = true,
-                PreferCompressedResponses = true,
-                UseFhirVersionInAcceptHeader = true,
             };
         }
 
         // TODO: instead of using serverName everywhere, create a FhirServiceFactory
         //       which internally manages FhirService instances with a HTTP/FHIR client
         //       already set.
-        public Task<Bundle> GetPatientsAsync(string serverNameSlug)
-        {
-            var fhirClient = GetFhirClientFromServerNameSlug(serverNameSlug);
-
-            var sp = new SearchParams().OrderBy("_lastUpdated", SortOrder.Descending);
-            return fhirClient.SearchAsync<Patient>(sp);
-        }
-
         public async Task<Bundle> GetPatientsAsync(
             string serverNameSlug,
             Bundle? currentPage = null
@@ -59,6 +51,7 @@ namespace magniFHIR.Data
             var fhirClient = GetFhirClientFromServerNameSlug(serverNameSlug);
 
             var pageSize = browsersOptions.ResourceBrowsers[ResourceType.Patient].PageSize;
+            var orderBy = browsersOptions.ResourceBrowsers[ResourceType.Patient].SortBy;
 
             Bundle results;
             if (currentPage is not null)
@@ -68,7 +61,7 @@ namespace magniFHIR.Data
             else
             {
                 var sp = new SearchParams()
-                    .OrderBy("_lastUpdated", SortOrder.Descending)
+                    .OrderBy(orderBy, SortOrder.Descending)
                     .LimitTo(pageSize);
                 results = await fhirClient.SearchAsync<Patient>(sp);
             }
@@ -76,31 +69,32 @@ namespace magniFHIR.Data
             return results;
         }
 
-        public async Task<List<TResource>> GetResourcesByPatientIdAsync<TResource>(
+        public async Task<Bundle> GetResourcesByPatientIdAsync(
             string serverNameSlug,
             string patientResourceId,
-            string orderBy = "_lastUpdated"
+            ResourceType resourceType,
+            Bundle? currentPage = null
         )
-            where TResource : Resource
         {
             var fhirClient = GetFhirClientFromServerNameSlug(serverNameSlug);
 
-            var resultList = new List<TResource>();
-            var sp = new SearchParams("subject", $"Patient/{patientResourceId}").OrderBy(
-                orderBy,
-                SortOrder.Descending
-            );
-            var resultBundle = await fhirClient.SearchAsync<TResource>(sp);
+            var pageSize = browsersOptions.ResourceBrowsers[resourceType].PageSize;
+            var orderBy = browsersOptions.ResourceBrowsers[resourceType].SortBy;
 
-            while (resultBundle != null)
+            Bundle results;
+            if (currentPage is not null)
             {
-                resultList.AddRange(
-                    resultBundle.Entry.Select(entry => entry.Resource).Cast<TResource>()
-                );
-                resultBundle = await fhirClient.ContinueAsync(resultBundle);
+                results = await fhirClient.ContinueAsync(currentPage, PageDirection.Next);
+            }
+            else
+            {
+                var sp = new SearchParams("subject", $"Patient/{patientResourceId}")
+                    .OrderBy(orderBy, SortOrder.Descending)
+                    .LimitTo(pageSize);
+                results = await fhirClient.SearchAsync(sp, resourceType.ToString());
             }
 
-            return resultList;
+            return results;
         }
 
         public async Task<Patient?> GetPatientsByIdAsync(string serverNameSlug, string resourceId)

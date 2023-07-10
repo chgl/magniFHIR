@@ -29,7 +29,7 @@ builder.Services.AddSingleton(sp =>
     return config!.Get<ResourceBrowsersOptions>()!;
 });
 
-var serverOptions = builder.Configuration.Get<FhirServersOptions>();
+var serverOptions = builder.Configuration.Get<FhirServersOptions>()!;
 
 foreach (var server in serverOptions.FhirServers)
 {
@@ -62,10 +62,9 @@ if (isTracingEnabled)
 {
     var assemblyVersion =
         Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "unknown";
-    var tracingExporter = builder.Configuration
-        .GetValue<string>("Tracing:Exporter")
-        .ToLowerInvariant();
-    var serviceName = builder.Configuration.GetValue<string>("Tracing:ServiceName");
+    var tracingExporter =
+        builder.Configuration.GetValue<string>("Tracing:Exporter")?.ToLowerInvariant() ?? "jaeger";
+    var serviceName = builder.Configuration.GetValue<string>("Tracing:ServiceName") ?? "magniFHIR";
 
     builder.Services
         .AddOpenTelemetry()
