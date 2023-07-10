@@ -57,6 +57,19 @@ The basic structure and available configuration options is shown here:
 }
 ```
 
+## Customizing Resource Browsers
+
+> **Warning**
+> This is an experimental feature. No guarantees that there won't be changes to the default
+> resource tables or the way data is displayed.
+
+It is possible to customize the tables displaying FHIR resources in the `Patient Record` view.
+This allows changing the type of resources displayed and the path within each resource to show as a column in the table.
+See the `ResourceBrowsers` key in [appsettings.json](./src/magniFHIR/appsettings.json) for the defaults.
+
+It's easiest to define a custom `appsettings.Production.json` and mount it inside the container.
+See the [configuration section](#configuration) above.
+
 ## Development
 
 ### Docker Compose

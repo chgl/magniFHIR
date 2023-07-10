@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Prometheus;
 using OpenTelemetry.Resources;
 using OpenTelemetry;
+using magniFHIR.Config;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,7 +23,13 @@ builder.Services.AddSingleton(sp =>
     return config!.Get<FhirServersOptions>()!;
 });
 
-var serverOptions = builder.Configuration.Get<FhirServersOptions>();
+builder.Services.AddSingleton(sp =>
+{
+    var config = sp.GetService<IConfiguration>();
+    return config!.Get<ResourceBrowsersOptions>()!;
+});
+
+var serverOptions = builder.Configuration.Get<FhirServersOptions>()!;
 
 foreach (var server in serverOptions.FhirServers)
 {
@@ -55,10 +62,9 @@ if (isTracingEnabled)
 {
     var assemblyVersion =
         Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "unknown";
-    var tracingExporter = builder.Configuration
-        .GetValue<string>("Tracing:Exporter")
-        .ToLowerInvariant();
-    var serviceName = builder.Configuration.GetValue<string>("Tracing:ServiceName");
+    var tracingExporter =
+        builder.Configuration.GetValue<string>("Tracing:Exporter")?.ToLowerInvariant() ?? "jaeger";
+    var serviceName = builder.Configuration.GetValue<string>("Tracing:ServiceName") ?? "magniFHIR";
 
     builder.Services
         .AddOpenTelemetry()

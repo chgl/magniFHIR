@@ -8,41 +8,41 @@
 
 <MudText Typo="Typo.h3" GutterBottom="true">Patient Browser</MudText>
 
-<MudTable Dense="true" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info" ServerData="@(new Func<TableState, Task<TableData<Patient>>>(ServerReload))" >
+<MudTable Dense="true" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info" ServerData="@(new Func<TableState, Task<TableData<Patient>>>(ServerReload))">
     <HeaderContent>
+        <MudTh>Id</MudTh>
         <MudTh>Name</MudTh>
         <MudTh>Birth Date</MudTh>
         <MudTh>Gender</MudTh>
         <MudTh>MRN</MudTh>
-        <MudTh>Id</MudTh>
         <MudTh>Last Updated</MudTh>
         <MudTh>Patient Record</MudTh>
     </HeaderContent>
     <RowTemplate>
+        <MudTd DataLabel="Id">@context.Id</MudTd>
         <MudTd DataLabel="Name">@context.DisplayName()</MudTd>
         <MudTd DataLabel="BirthDate">@context.BirthDate</MudTd>
         <MudTd DataLabel="Gender">@context.Gender</MudTd>
         <MudTd DataLabel="MRN">@(string.Join(", ", context.MedicalRecordNumbers()))</MudTd>
-            <MudTd DataLabel="Id">@context.Id</MudTd>
             <MudTd DataLabel="LastUpdated">@context.Meta?.LastUpdated</MudTd>
             <MudTd>
                 <MudButton Size="Size.Small" Variant="Variant.Outlined" Color="Color.Secondary"
-                    EndIcon="@Icons.Material.Filled.ContactPage"
-                    Href="@($"/servers/{FhirServerNameSlug}/patients/{context.Id}")" Target="_blank">
+                           EndIcon="@Icons.Material.Filled.ContactPage"
+                           Href="@($"/servers/{FhirServerNameSlug}/patients/{context.Id}")" Target="_blank">
                     View Record
                 </MudButton>
             </MudTd>
-    </RowTemplate>
-    <NoRecordsContent>
-        <MudText>No matching records found</MudText>
-    </NoRecordsContent>
-    <LoadingContent>
-        <MudText>Loading...</MudText>
-    </LoadingContent>
-    <PagerContent>
-        <MudTablePager HideRowsPerPage="true" HidePageNumber="true" LastIcon="null" FirstIcon="null" BeforeIcon="null"/>
-    </PagerContent>
-</MudTable>
+        </RowTemplate>
+        <NoRecordsContent>
+            <MudText>No matching records found</MudText>
+        </NoRecordsContent>
+        <LoadingContent>
+            <MudText>Loading...</MudText>
+        </LoadingContent>
+        <PagerContent>
+            <MudTablePager HideRowsPerPage="true" HidePageNumber="true" LastIcon="null" FirstIcon="null" BeforeIcon="null" />
+        </PagerContent>
+    </MudTable>
 
 @code {
     [Parameter]
@@ -70,6 +70,6 @@
             totalItems = patients.Count;
         }
 
-        return new TableData<Patient>() {Items = patients, TotalItems = totalItems};
+        return new TableData<Patient>() { Items = patients, TotalItems = totalItems };
     }
 }

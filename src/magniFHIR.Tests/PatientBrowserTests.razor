@@ -9,7 +9,7 @@
     public void RendersEmptyWithEmptyPatientList()
     {
         var fakeFhirService = A.Fake<IFhirService>();
-        A.CallTo(() => fakeFhirService.GetPatientsAsync(A<string>._))
+        A.CallTo(() => fakeFhirService.GetPatientsAsync(A<string>._, A<Bundle>._))
         .Returns(System.Threading.Tasks.Task.FromResult(new Bundle()));
 
         Services.AddSingleton<IFhirService>(fakeFhirService);
@@ -29,7 +29,7 @@
         bundle.AddResourceEntry(emptyPatient, "Patient/1");
 
         var fakeFhirService = A.Fake<IFhirService>();
-        A.CallTo(() => fakeFhirService.GetPatientsAsync(A<string>._))
+        A.CallTo(() => fakeFhirService.GetPatientsAsync(A<string>._, A<Bundle>._))
           .Returns(System.Threading.Tasks.Task.FromResult(bundle));
 
         Services.AddSingleton<IFhirService>(fakeFhirService);

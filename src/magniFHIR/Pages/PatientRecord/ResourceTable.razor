@@ -1,0 +1,112 @@
+@using Hl7.Fhir.Model
+@using magniFHIR.Config;
+@using magniFHIR.Data
+@using Hl7.FhirPath;
+@using Hl7.Fhir.FhirPath;
+
+@inject IFhirService FhirService
+
+<MudTable Dense="true"
+          Hover="true"
+          Breakpoint="Breakpoint.Sm"
+          LoadingProgressColor="Color.Info"
+          ServerData="@(new Func<TableState, Task<TableData<Resource>>>(ServerReload))">
+    <HeaderContent>
+        @foreach (var column in Config?.Columns)
+        {
+            <MudTh>@column.Header</MudTh>
+        }
+    </HeaderContent>
+    <RowTemplate>
+        @foreach (var column in Config?.Columns)
+        {
+            <MudTd>@string.Join(", " , context.Select(column.Path).Select(b => b.ToString()))</MudTd>
+        }
+    </RowTemplate>
+    <NoRecordsContent>
+        <MudText>No matching records found</MudText>
+    </NoRecordsContent>
+    <LoadingContent>
+        <MudText>Loading...</MudText>
+    </LoadingContent>
+    <PagerContent>
+        <MudTablePager HideRowsPerPage="true" HidePageNumber="true" LastIcon="false" FirstIcon="false" BeforeIcon="false" />
+    </PagerContent>
+</MudTable>
+
+@code {
+    [Parameter] public ResourceBrowserConfig Config { get; set; }
+    [Parameter] public ResourceType ResourceType { get; set; }
+    [Parameter] public string? PatientId { get; set; }
+    [Parameter] public string? FhirServerNameSlug { get; set; }
+
+    public List<Resource> Resources { get; set; } = new();
+
+    private Bundle? currentPage = null;
+    private async Task<TableData<Resource>> ServerReload(TableState state)
+    {
+        if (FhirServerNameSlug is null)
+        {
+            throw new InvalidOperationException("Requested patient browser without server name set.");
+        }
+
+        if (PatientId is null)
+        {
+            return new TableData<Resource>();
+        }
+
+        var bundle = await FhirService.GetResourcesByPatientIdAsync(FhirServerNameSlug, PatientId, ResourceType, currentPage);
+
+        currentPage = bundle;
+
+        var resources = bundle.Entry.Select(entry => entry.Resource).ToList();
+
+        var totalItems = int.MaxValue;
+        if (bundle.NextLink is null)
+        {
+            // if there are no more pages after this one, we disable the next button
+            // by setting the totalItems to the number of items returned.
+            totalItems = resources.Count;
+        }
+
+        return new TableData<Resource>() { Items = resources, TotalItems = totalItems };
+    }
+
+    // TODO: use this to implement prettier formatting for values
+    private static string? ObservationValueToDisplay(DataType value)
+    {
+        if (value is null)
+        {
+            return null;
+        }
+
+        switch (value)
+        {
+            case Quantity quantity:
+                return $"{quantity.Value} {quantity.Unit}";
+            case CodeableConcept codeableConcept:
+                var codings = string.Join(",", codeableConcept.Coding.Select(coding => $"{coding.System}#{coding.Code}"));
+                return $"{codeableConcept.Text} {codings}";
+            case FhirString stringValue:
+                return stringValue.Value;
+            case FhirBoolean booleanValue:
+                return booleanValue.ToString();
+            case FhirDecimal decimalValue:
+                return decimalValue.ToString();
+            case Hl7.Fhir.Model.Range rangeValue:
+                return $"{rangeValue.Low} - {rangeValue.High}";
+            case Ratio ratioValue:
+                return $"{ratioValue.Numerator}/{ratioValue.Denominator}";
+            case FhirDateTime dateTimeValue:
+                return dateTimeValue.ToString();
+            case Time timeValue:
+                return timeValue.ToString();
+            case Integer integerValue:
+                return integerValue.ToString();
+            case Period periodValue:
+                return $"{periodValue.Start} to {periodValue.End}";
+            default:
+                return $"Unsupported type for display: {value.TypeName}. Please raise an issue on GitHub.";
+        }
+    }
+}
