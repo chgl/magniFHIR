@@ -34,7 +34,7 @@ Open <http://localhost:8080/> in your browser, select the `HAPI FHIR Test Server
 
 Multiple FHIR servers can be configured including support for basic authentication.
 You can use environment variables to set each entry in the `FhirServers` key, as done above,
-or mount a file called `appsettings.Production.json` inside the container as `/app/appsettings.Production.json`.
+or mount a file called `appsettings.Production.json` inside the container as `/opt/magnifhir/appsettings.Production.json`.
 
 The basic structure and available configuration options is shown here:
 

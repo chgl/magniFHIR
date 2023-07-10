@@ -12,10 +12,10 @@ public class FhirServersOptions
 
 public class FhirServerConfig
 {
-    public string? Name { get; init; }
+    public string Name { get; init; } = "Unnamed FHIR server";
     public Uri? BaseUrl { get; init; }
-    public string? NameSlug => Slugify(Name);
-    public FhirServerAuthConfig? Auth { get; set; }
+    public string NameSlug => Slugify(Name);
+    public FhirServerAuthConfig? Auth { get; init; }
 
     public override string ToString()
     {
@@ -33,11 +33,11 @@ public class FhirServerConfig
     }
 
     // code based on <https://docs.microsoft.com/en-us/aspnet/core/fundamentals/routing?view=aspnetcore-6.0#parameter-transformers>
-    private static string? Slugify(string? value)
+    private static string Slugify(string value)
     {
-        if (value is null)
+        if (string.IsNullOrWhiteSpace(value))
         {
-            return null;
+            throw new ArgumentNullException(nameof(value));
         }
 
         var normalizedTitle = value.Normalize(NormalizationForm.FormD);
@@ -72,11 +72,11 @@ public class FhirServerConfig
 
 public class FhirServerAuthConfig
 {
-    public FhirServerBasicAuthConfig? Basic { get; set; }
+    public FhirServerBasicAuthConfig? Basic { get; init; }
 }
 
 public class FhirServerBasicAuthConfig
 {
-    public string? Username { get; set; }
-    public string? Password { get; set; }
+    public string? Username { get; init; }
+    public string? Password { get; init; }
 }
