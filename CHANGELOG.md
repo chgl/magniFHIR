@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/chgl/magniFHIR/compare/v1.3.0...v1.4.0) (2023-07-11)
+
+
+### Features
+
+* slightly prettier display for some data types ([#72](https://github.com/chgl/magniFHIR/issues/72)) ([5c7e7c0](https://github.com/chgl/magniFHIR/commit/5c7e7c01a1d42cb0306acbe8deda37c4d002c738))
+
 ## [1.3.0](https://github.com/chgl/magniFHIR/compare/v1.2.0...v1.3.0) (2023-07-10)
 
 
