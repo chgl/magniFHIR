@@ -20,7 +20,7 @@
     <RowTemplate>
         @foreach (var column in Config?.Columns)
         {
-            <MudTd>@string.Join(", " , context.Select(column.Path).Select(b => b.ToString()))</MudTd>
+            <MudTd>@string.Join(", " , context.Select(column.Path).Select(b => ObservationValueToDisplay(b)))</MudTd>
         }
     </RowTemplate>
     <NoRecordsContent>
@@ -73,7 +73,7 @@
     }
 
     // TODO: use this to implement prettier formatting for values
-    private static string? ObservationValueToDisplay(DataType value)
+    private static string? ObservationValueToDisplay(Base value)
     {
         if (value is null)
         {
@@ -106,7 +106,7 @@
             case Period periodValue:
                 return $"{periodValue.Start} to {periodValue.End}";
             default:
-                return $"Unsupported type for display: {value.TypeName}. Please raise an issue on GitHub.";
+                return value.ToString();
         }
     }
 }
