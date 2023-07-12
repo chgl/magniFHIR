@@ -1,0 +1,38 @@
+﻿@using Hl7.Fhir.Model;
+
+<MudText Typo="Typo.subtitle2">@Concept.Text</MudText>
+
+@foreach(var coding in Concept.Coding)
+{
+    <MudTooltip>
+        <ChildContent>
+            <MudChip Size="Size.Small" Color="@MapSystemToColor(coding.System)">@coding.Code</MudChip>
+        </ChildContent>
+        <TooltipContent>
+            <MudText Typo="Typo.body2">@coding.System</MudText>
+            <MudText Typo="Typo.body2">@coding.Display</MudText>
+            <MudText Typo="Typo.body2">@coding.Version</MudText>
+        </TooltipContent>
+    </MudTooltip>
+}
+
+@code {
+    [Parameter]
+    public CodeableConcept Concept { get; set; }
+
+    private static int MaxColorValues = Enum.GetValues<Color>().Length;
+
+    private Color MapSystemToColor(string system)
+    {
+        if(string.IsNullOrWhiteSpace(system))
+        {
+            return Color.Default;
+        }
+
+        var hashCode = system.Sum(part => Convert.ToInt32(part));
+
+        int mappedValue = Math.Abs(hashCode % MaxColorValues);
+
+        return (Color)Enum.ToObject(typeof(Color), mappedValue);
+    }
+}
