@@ -26,7 +26,9 @@ Open <http://localhost:8080/> in your browser, select the `HAPI FHIR Test Server
 
 ![Screenshot showing the patient browser](/docs/img/screenshots/patient-browser.png "List all Patient resources stored in the server")
 
-![Screenshot showing the patient record conditions tab](/docs/img/screenshots/patient-record-conditions.png "See a Patient's conditions, observations, and medications")
+![Screenshot showing the patient record conditions tab](/docs/img/screenshots/patient-record-conditions.png "See a Patient's Condition resources")
+
+![Screenshot showing the patient record observations tab](/docs/img/screenshots/patient-record-observations.png "See a Patient's Observation resources")
 
 ## Configuration
 
