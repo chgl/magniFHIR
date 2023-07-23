@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.5.1](https://github.com/chgl/magniFHIR/compare/v1.5.0...v1.5.1) (2023-07-23)
+
+
+### Bug Fixes
+
+* several minor refactorings and improvements ([#76](https://github.com/chgl/magniFHIR/issues/76)) ([f52dbc1](https://github.com/chgl/magniFHIR/commit/f52dbc1ef52f3f53a5b0446841e4a8e6e16c70cf))
+
+
+### Miscellaneous Chores
+
+* added all secret fingerprints to gitleaksignore ([8f01a19](https://github.com/chgl/magniFHIR/commit/8f01a19e08fcc72daed93e1d1ad6e125fcf3d5b2))
+
 ## [1.5.0](https://github.com/chgl/magniFHIR/compare/v1.4.0...v1.5.0) (2023-07-12)
 
 
