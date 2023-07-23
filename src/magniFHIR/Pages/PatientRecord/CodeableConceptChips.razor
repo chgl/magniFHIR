@@ -18,7 +18,7 @@
 
 @code {
     [Parameter]
-    public CodeableConcept Concept { get; set; }
+    public CodeableConcept Concept { get; set; } = new();
 
     private static int MaxColorValues = Enum.GetValues<Color>().Length;
 

@@ -82,14 +82,23 @@ services:
 
   loader:
     image: index.docker.io/curlimages/curl:7.86.0@sha256:cfdeba7f88bb85f6c87f2ec9135115b523a1c24943976a61fbf59c4f2eafd78e
-    command: >
-      sh -c "curl -X POST -H 'Content-Type:application/fhir+json' --retry-connrefuse --connect-timeout 30 --max-time 60 --retry 5 --retry-delay 15 --data '@/data/hospitalInformation1658779445044.json' http://hapi-fhir-server:8080/fhir &&
-             curl -X POST -H 'Content-Type:application/fhir+json' --retry-connrefuse --connect-timeout 30 --max-time 60 --retry 5 --retry-delay 15 --data '@/data/practitionerInformation1658779445044.json' http://hapi-fhir-server:8080/fhir &&
-             curl -X POST -H 'Content-Type:application/fhir+json' --retry-connrefuse --connect-timeout 30 --max-time 60 --retry 5 --retry-delay 15 --data '@/data/Ashleigh_Olson_9d9b8bed-7b79-7fa9-cea1-f133a6b4d551.json' http://hapi-fhir-server:8080/fhir &&
-             curl -X POST -H 'Content-Type:application/fhir+json' --retry-connrefuse --connect-timeout 30 --max-time 60 --retry 5 --retry-delay 15 --data '@/data/Eugene_Purdy_2500b9ad-56c8-447d-d0b4-589dea3008ba.json' http://hapi-fhir-server:8080/fhir &&
-             curl -X POST -H 'Content-Type:application/fhir+json' --retry-connrefuse --connect-timeout 30 --max-time 60 --retry 5 --retry-delay 15 --data '@/data/Grace_Jenkins_0b72a5cf-ab16-61cb-4cdc-727a1078fdd6.json' http://hapi-fhir-server:8080/fhir &&
-             curl -X POST -H 'Content-Type:application/fhir+json' --retry-connrefuse --connect-timeout 30 --max-time 60 --retry 5 --retry-delay 15 --data '@/data/Latina_Hana_Turcotte_c4b841d9-b890-48d1-cb0c-87450e1f2737.json' http://hapi-fhir-server:8080/fhir &&
-             curl -X POST -H 'Content-Type:application/fhir+json' --retry-connrefuse --connect-timeout 30 --max-time 60 --retry 5 --retry-delay 15 --data '@/data/Mattie_Zboncak_c423a667-3ea7-f553-a179-a4cf1948221f.json' http://hapi-fhir-server:8080/fhir"
+    environment:
+      FHIR_SERVER_BASE_URL: "http://hapi-fhir-server:8080/fhir"
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        for fhir_file in /data/*.json; do
+          echo "Uploading $${fhir_file} to $${FHIR_SERVER_BASE_URL}"
+          curl -X POST \
+               -H 'Content-Type: application/fhir+json' \
+               --retry-connrefuse \
+               --connect-timeout 30 \
+               --max-time 60 \
+               --retry 5 \
+               --retry-delay 15 \
+               --data "@$${fhir_file}" \
+               $${FHIR_SERVER_BASE_URL}
+        done;
     volumes:
       - ./fhir:/data:ro
     depends_on:
@@ -212,3 +221,35 @@ services:
       - "traefik.http.services.jaeger.loadbalancer.server.port=16686"
       - "traefik.http.routers.jaeger.rule=Host(`jaeger.127.0.0.1.nip.io`)"
       - "traefik.http.routers.jaeger.entrypoints=web"
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:21.1.1@sha256:8ebb3930c41e8a066c4246eaf351ac09cdc984e11b1f607d6ff4ce10d69dc808
+    restart: unless-stopped
+    ipc: none
+    security_opt:
+      - "no-new-privileges:true"
+    cap_drop:
+      - ALL
+    privileged: false
+    deploy:
+      resources:
+        limits:
+          memory: 2048m
+    command:
+      - start-dev
+      - --import-realm
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    volumes:
+      - type: bind
+        source: ./keycloak/magnifhir-realm-export.json
+        target: /opt/keycloak/data/import/magnifhir-realm-export.json
+        read_only: true
+    ports:
+      - 127.0.0.1:8083:8080
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.keycloak.loadbalancer.server.port=8080"
+      - "traefik.http.routers.keycloak.rule=Host(`auth.127.0.0.1.nip.io`)"
+      - "traefik.http.routers.keycloak.entrypoints=web"

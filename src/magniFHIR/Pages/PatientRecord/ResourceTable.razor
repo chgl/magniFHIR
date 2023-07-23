@@ -5,6 +5,8 @@
 @using Hl7.Fhir.FhirPath;
 
 @inject IFhirService FhirService
+@inject ILogger<ResourceTable> logger
+@inject ISnackbar Snackbar
 
 <MudTable Dense="true"
           Hover="true"
@@ -12,17 +14,29 @@
           LoadingProgressColor="Color.Info"
           ServerData="@(new Func<TableState, Task<TableData<Resource>>>(ServerReload))">
     <HeaderContent>
-        @foreach (var column in Config?.Columns)
+        @foreach (var column in Config.Columns)
         {
             <MudTh>@column.Header</MudTh>
         }
     </HeaderContent>
     <RowTemplate>
-        @foreach (var column in Config?.Columns)
+        @foreach (var column in Config.Columns)
         {
-            var value = context.Select(column.Path).FirstOrDefault();
+            if (column.Header is null || column.Path is null)
+            {
+                logger.LogWarning("Column header or column path is unset. Ignoring.");
+                continue;
+            }
 
-            switch (value)
+            var results = context.Select(column.Path);
+
+            if (results.Count() > 1)
+            {
+                Snackbar.Add($"FHIRPath expression for column '{column.Header}' returned more than one result element. Only the first one is displayed.", Severity.Warning);
+            }
+
+            var result = results.FirstOrDefault();
+            switch (result)
             {
                 case CodeableConcept codeableConcept:
                     <MudTd>
@@ -38,7 +52,7 @@
                     <MudTd>
                         <MudTooltip>
                             <ChildContent>
-                                <MudText>@dateTime.ToString()</MudText>
+                                <MudChip Size="Size.Small" Label="true">@dateTime.ToString()</MudChip>
                             </ChildContent>
                             <TooltipContent>
                                 <MudText>@dateTime.ToString()</MudText>
@@ -48,21 +62,24 @@
                     break;
                 case Id id:
                     var idAsString = id.ToString();
-                    var truncatedId = idAsString.ToString().Substring(0, Math.Min(idAsString.Length, 8));
-                    if (truncatedId.Length < idAsString.Length)
+                    if (idAsString is not null)
                     {
-                        truncatedId += "...";
+                        var truncatedId = idAsString.ToString().Substring(0, Math.Min(idAsString.Length, 8));
+                        if (truncatedId.Length < idAsString.Length)
+                        {
+                            truncatedId += "...";
+                        }
+                        <MudTd>
+                            <MudTooltip>
+                                <ChildContent>
+                                    <MudText>@truncatedId</MudText>
+                                </ChildContent>
+                                <TooltipContent>
+                                    <MudText>@id</MudText>
+                                </TooltipContent>
+                            </MudTooltip>
+                        </MudTd>
                     }
-                    <MudTd>
-                        <MudTooltip>
-                            <ChildContent>
-                                <MudText>@truncatedId</MudText>
-                            </ChildContent>
-                            <TooltipContent>
-                                <MudText>@id</MudText>
-                            </TooltipContent>
-                        </MudTooltip>
-                    </MudTd>
                     break;
                 case Quantity quantity:
                     <MudTd>
@@ -86,7 +103,7 @@
                     break;
                 // TODO: match on Hl7.Fhir.Model.Code`1[Hl7.Fhir.Model.EventStatus]
                 default:
-                    <MudTd>@value</MudTd>
+                    <MudTd>@result</MudTd>
                     break;
             }
         }
@@ -103,7 +120,7 @@
 </MudTable>
 
 @code {
-    [Parameter] public ResourceBrowserConfig Config { get; set; }
+    [Parameter] public ResourceBrowserConfig Config { get; set; } = new();
     [Parameter] public ResourceType ResourceType { get; set; }
     [Parameter] public string? PatientId { get; set; }
     [Parameter] public string? FhirServerNameSlug { get; set; }

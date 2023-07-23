@@ -57,7 +57,7 @@ foreach (var server in serverOptions.FhirServers)
 builder.Services.AddMudServices();
 
 // Tracing
-var isTracingEnabled = builder.Configuration.GetValue<bool>("Tracing:Enabled");
+var isTracingEnabled = builder.Configuration.GetValue("Tracing:Enabled", false);
 if (isTracingEnabled)
 {
     var assemblyVersion =
@@ -88,7 +88,7 @@ if (isTracingEnabled)
                         var ignoredPaths = new[] { "/healthz", "/readyz", "/livez" };
 
                         var path = r.Request.Path.Value;
-                        return !ignoredPaths.Any(path.Contains);
+                        return !ignoredPaths.Any(path!.Contains);
                     };
                 });
 
@@ -106,6 +106,7 @@ if (isTracingEnabled)
                         otlpOptions =>
                             otlpOptions.Endpoint = new Uri(
                                 builder.Configuration.GetValue<string>("Tracing:Otlp:Endpoint")
+                                    ?? "http://localhost:4317"
                             )
                     );
                     break;
@@ -120,6 +121,7 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
+    app.Logger.LogInformation("Running in Production mode");
     app.UseExceptionHandler("/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
@@ -127,16 +129,18 @@ if (!app.Environment.IsDevelopment())
 
 app.UseStaticFiles();
 
-app.UseMetricServer(8081);
+app.UseMetricServer(app.Configuration.GetValue("Metrics:Port", 8081));
 
 app.UseRouting();
 app.UseHttpMetrics();
 
-app.MapBlazorHub();
-app.MapFallbackToPage("/_Host");
-
+app.MapHealthChecks("/healthz");
 app.MapHealthChecks("/readyz", new HealthCheckOptions { Predicate = _ => false });
-
 app.MapHealthChecks("/livez", new HealthCheckOptions { Predicate = _ => false });
+
+app.MapRazorPages();
+app.MapBlazorHub();
+
+app.MapFallbackToPage("/_Host");
 
 app.Run();

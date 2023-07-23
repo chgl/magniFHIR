@@ -53,20 +53,17 @@ namespace magniFHIR.Data
             var pageSize = browsersOptions.ResourceBrowsers[ResourceType.Patient].PageSize;
             var orderBy = browsersOptions.ResourceBrowsers[ResourceType.Patient].SortBy;
 
-            Bundle results;
             if (currentPage is not null)
             {
-                results = await fhirClient.ContinueAsync(currentPage, PageDirection.Next);
+                return await fhirClient.ContinueAsync(currentPage, PageDirection.Next);
             }
             else
             {
                 var sp = new SearchParams()
                     .OrderBy(orderBy, SortOrder.Descending)
                     .LimitTo(pageSize);
-                results = await fhirClient.SearchAsync<Patient>(sp);
+                return await fhirClient.SearchAsync<Patient>(sp);
             }
-
-            return results;
         }
 
         public async Task<Bundle> GetResourcesByPatientIdAsync(
@@ -81,20 +78,17 @@ namespace magniFHIR.Data
             var pageSize = browsersOptions.ResourceBrowsers[resourceType].PageSize;
             var orderBy = browsersOptions.ResourceBrowsers[resourceType].SortBy;
 
-            Bundle results;
             if (currentPage is not null)
             {
-                results = await fhirClient.ContinueAsync(currentPage, PageDirection.Next);
+                return await fhirClient.ContinueAsync(currentPage, PageDirection.Next);
             }
             else
             {
                 var sp = new SearchParams("subject", $"Patient/{patientResourceId}")
                     .OrderBy(orderBy, SortOrder.Descending)
                     .LimitTo(pageSize);
-                results = await fhirClient.SearchAsync(sp, resourceType.ToString());
+                return await fhirClient.SearchAsync(sp, resourceType.ToString());
             }
-
-            return results;
         }
 
         public async Task<Patient?> GetPatientsByIdAsync(string serverNameSlug, string resourceId)

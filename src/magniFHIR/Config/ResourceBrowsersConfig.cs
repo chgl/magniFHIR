@@ -17,6 +17,6 @@ public class ResourceBrowserConfig
 
 public class ResourceTableColumn
 {
-    public string Header { get; set; }
-    public string Path { get; set; }
+    public string? Header { get; set; }
+    public string? Path { get; set; }
 }
