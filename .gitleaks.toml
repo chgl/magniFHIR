@@ -1,0 +1,6 @@
+[allowlist]
+description = "global allow list"
+paths = [
+    '''hack/keycloak/magnifhir-realm-export.json''',
+    '''src/magniFHIR/appsettings.Development.json''',
+]
