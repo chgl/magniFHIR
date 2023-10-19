@@ -20,6 +20,8 @@ jobs:
       pull-requests: write
       actions: read
     with:
+      # explicitly lowercase the repo name
+      image: "ghcr.io/chgl/magnifhir"
       enable-build-test-layer: true
       enable-upload-test-image: false
     secrets:
