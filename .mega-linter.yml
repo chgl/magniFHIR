@@ -12,9 +12,10 @@ DISABLE_LINTERS:
   - REPOSITORY_DEVSKIM
   - MARKDOWN_MARKDOWN_TABLE_FORMATTER
   - REPOSITORY_KICS
+  - CSHARP_DOTNET_FORMAT
 
 SHOW_ELAPSED_TIME: true
 FILEIO_REPORTER: false
 # DISABLE_ERRORS: true # Uncomment if you want MegaLinter to detect errors but not block CI to pass
 REPOSITORY_TRIVY_ARGUMENTS:
-  - "--severity='HIGH,CRITICAL'"
+  - "--severity=HIGH,CRITICAL"

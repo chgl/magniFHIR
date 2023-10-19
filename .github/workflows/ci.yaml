@@ -8,95 +8,33 @@ on:
   pull_request:
     branches: [master]
 
-# Declare default permissions as read only.
 permissions: read-all
-
-env:
-  IMAGE_NAME: ghcr.io/chgl/magnifhir
 
 jobs:
   build:
-    name: build
-    runs-on: ubuntu-22.04
+    uses: chgl/.github/.github/workflows/standard-build.yaml@9ecb33b4f2ee22ac69359a9d3df94ab02164e216 # v1.3.0
     permissions:
-      # used by cosign
+      contents: read
       id-token: write
-      # used for pushing to ghcr.io
       packages: write
-    outputs:
-      image-digest: ${{ steps.build.outputs.digest }}
-      image-name: ${{ env.IMAGE_NAME }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
-
-      - name: Docker meta
-        id: docker_meta
-        uses: docker/metadata-action@818d4b7b91585d195f67373fd9cb0332e31a7175 # v4
-        with:
-          images: |
-            ${{ env.IMAGE_NAME }}
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@dc7b9719a96d48369863986a06765841d7ea23f6 # tag=v2
-
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@465a07811f14bebb1938fbed4728c6a1ff8901fc # v2
-        if: github.event_name != 'pull_request'
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Run unit tests
-        id: docker_build_unit_test
-        uses: docker/build-push-action@1104d471370f9806843c095c1db02b5a90c5f8b6 # v3
-        with:
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          push: false
-          target: test
-
-      - name: Build and push
-        id: build
-        uses: docker/build-push-action@1104d471370f9806843c095c1db02b5a90c5f8b6 # v3
-        with:
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.docker_meta.outputs.tags }}
-          labels: ${{ steps.docker_meta.outputs.labels }}
-          load: ${{ github.event_name == 'pull_request' }}
-
-      - name: Install Cosign
-        if: ${{ github.event_name != 'pull_request' }}
-        uses: sigstore/cosign-installer@9becc617647dfa20ae7b1151972e9b3a2c338a2b # tag=v2.8.1
-
-      - name: Sign images
-        if: ${{ github.event_name != 'pull_request' }}
-        env:
-          COSIGN_EXPERIMENTAL: "true"
-          IMAGES: ${{ steps.docker_meta.outputs.tags }}
-        run: |
-          while read -r image; do
-            echo "Signing '$image' using keyless approach"
-            cosign sign "$image"
-          done <<< "$IMAGES"
-
-  container-provenance:
-    if: ${{ startsWith(github.ref, 'refs/tags/') }}
-    needs:
-      - build
-    permissions:
-      actions: read # for detecting the Github Actions environment.
-      id-token: write # for creating OIDC tokens for signing.
-      packages: write # for uploading attestations.
-    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@v1.4.0
+      pull-requests: write
+      actions: read
     with:
-      image: ${{ needs.build.outputs.image-name }}
-      digest: ${{ needs.build.outputs.image-digest }}
-      registry-username: ${{ github.actor }}
-      # TODO(https://github.com/slsa-framework/slsa-github-generator/issues/492): Remove after GA release.
-      compile-generator: true
+      enable-build-test-layer: true
+      enable-upload-test-image: false
     secrets:
-      registry-password: ${{ secrets.GITHUB_TOKEN }}
+      github-token: ${{ secrets.GITHUB_TOKEN }}
+
+  lint:
+    uses: chgl/.github/.github/workflows/standard-lint.yaml@9ecb33b4f2ee22ac69359a9d3df94ab02164e216 # v1.3.0
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+      security-events: write
+      actions: read
+    with:
+      codeql-languages: '["csharp"]'
+      enable-codeql: true
+    secrets:
+      github-token: ${{ secrets.GITHUB_TOKEN }}
