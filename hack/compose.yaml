@@ -140,7 +140,7 @@ services:
       - l4h-fhir-db
 
   l4h-fhir-server:
-    image: ghcr.io/linuxforhealth/fhir-server:5.1.0@sha256:f2790fbb724e504d541cd97d0ce70dae79891e71f31136e1c01526d0d0cc4877
+    image: ghcr.io/linuxforhealth/fhir-server:5.1.0@sha256:23032ed025448e60cc6663a288f7d8802739e753f8cb053a4cda33b109a01e63
     restart: unless-stopped
     profiles:
       - l4h
