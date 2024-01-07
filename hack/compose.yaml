@@ -1,6 +1,6 @@
 services:
   traefik:
-    image: docker.io/library/traefik:v2.9.6@sha256:039029260b121d58cc15246c67eee9e38e76f807385d9be03dcdb42c06938e7c
+    image: docker.io/library/traefik:v2.10.7@sha256:c5181ddf303f1ccfd4bd6d1d9c4867b0500efb6089a0f9ccb16612438f6e934f
     restart: unless-stopped
     ipc: none
     security_opt:
@@ -22,7 +22,7 @@ services:
           memory: 128m
 
   hapi-fhir-server:
-    image: index.docker.io/hapiproject/hapi:v6.2.2@sha256:9c4e8af94d81ac0049dbb589e4cd855bf78c9c13be6f6844e814c63d63545b44
+    image: index.docker.io/hapiproject/hapi:v6.10.1@sha256:4eac1b3481180b028616d1fab7e657e368538063d75f7ed3be2032e34c657dd4
     restart: unless-stopped
     cap_drop:
       - ALL
@@ -65,7 +65,7 @@ services:
       - "traefik.http.routers.fhir.entrypoints=web"
 
   hapi-fhir-db:
-    image: index.docker.io/library/postgres:15.1@sha256:02547253a07e6edd0c070caba1d2a019b7dc7df98b948dc9a909e1808eb77024
+    image: index.docker.io/library/postgres:15.5@sha256:11019308d1b8c73d225f1c3b8ddcb1380d5957e7b934ef27050b1f91c8859ce2
     restart: unless-stopped
     ipc: private
     security_opt:
@@ -81,7 +81,7 @@ services:
       POSTGRES_DB: fhir
 
   loader:
-    image: index.docker.io/curlimages/curl:7.86.0@sha256:cfdeba7f88bb85f6c87f2ec9135115b523a1c24943976a61fbf59c4f2eafd78e
+    image: index.docker.io/curlimages/curl:7.88.1@sha256:48318407b8d98e8c7d5bd4741c88e8e1a5442de660b47f63ba656e5c910bc3da
     environment:
       FHIR_SERVER_BASE_URL: "http://hapi-fhir-server:8080/fhir"
     entrypoint: ["/bin/sh", "-c"]
@@ -105,7 +105,7 @@ services:
       - hapi-fhir-server
 
   l4h-fhir-db:
-    image: docker.io/library/postgres:14.6@sha256:f565573d74aedc9b218e1d191b04ec75bdd50c33b2d44d91bcd3db5f2fcea647
+    image: docker.io/library/postgres:14.10@sha256:1b8d18a565774e1734ea11ac1d4485d3eb168718f08c85dc2e24aeb16316249c
     restart: unless-stopped
     profiles:
       - l4h
@@ -123,7 +123,7 @@ services:
       POSTGRES_DB: fhir
 
   fhir-schematool:
-    image: ghcr.io/linuxforhealth/fhir-schematool:5.1.0@sha256:23359cd054e589b844db3eebe7d72e5fd0fe4152e6e4c9266051ae4b927d137c
+    image: ghcr.io/linuxforhealth/fhir-schematool:5.1.1@sha256:dcb215730acd269be098b39be81a44f6c3b3554287969f1b778d9e60c929f259
     restart: on-failure
     profiles:
       - l4h
@@ -140,7 +140,7 @@ services:
       - l4h-fhir-db
 
   l4h-fhir-server:
-    image: ghcr.io/linuxforhealth/fhir-server:5.1.0@sha256:23032ed025448e60cc6663a288f7d8802739e753f8cb053a4cda33b109a01e63
+    image: ghcr.io/linuxforhealth/fhir-server:5.1.1@sha256:660a5bc895e84557e44c67d453a0c284ccd8c9bbed8affbb766f7505ff47749c
     restart: unless-stopped
     profiles:
       - l4h
@@ -165,7 +165,7 @@ services:
       - "traefik.http.routers.l4h-fhir.entrypoints=web"
 
   fhir-server-for-azure:
-    image: mcr.microsoft.com/healthcareapis/r4-fhir-server:3.3.53@sha256:ce5e0574d16ffce84caa915ae9d206caedab2aea1b62cb788e49fc2ee191f9ca
+    image: mcr.microsoft.com/healthcareapis/r4-fhir-server:3.4.361@sha256:4d48030fbbd69f8ac5418c222e515bb1b0d00e85bfdc89ce6b461f3fe7c2d4d6
     restart: unless-stopped
     profiles:
       - azure
@@ -204,7 +204,7 @@ services:
       ACCEPT_EULA: "Y"
 
   jaeger:
-    image: docker.io/jaegertracing/all-in-one:1.40@sha256:fa8c1fc551ac31e161a7f729dbaf17e46aaccb0dbd5fbd772aeeb209802cb2a0
+    image: docker.io/jaegertracing/all-in-one:1.52@sha256:7885400a153ac908d8bfbf72c27e3389dbab1942a35dd0ce3228611dc48cbf9f
     restart: unless-stopped
     cap_drop:
       - ALL
@@ -223,7 +223,7 @@ services:
       - "traefik.http.routers.jaeger.entrypoints=web"
 
   keycloak:
-    image: quay.io/keycloak/keycloak:21.1.1@sha256:8ebb3930c41e8a066c4246eaf351ac09cdc984e11b1f607d6ff4ce10d69dc808
+    image: quay.io/keycloak/keycloak:21.1.2@sha256:3408c186dde4a95c2b99ef1290721bf1d253d64ba3a1de0a46c667b8288051f0
     restart: unless-stopped
     ipc: none
     security_opt:
