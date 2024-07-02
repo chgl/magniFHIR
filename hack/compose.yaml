@@ -191,7 +191,7 @@ services:
       - "traefik.http.routers.azure-fhir.entrypoints=web"
 
   fhir-server-for-azure-mssql-db:
-    image: mcr.microsoft.com/mssql/server:2022-latest@sha256:ffef32dda16cc5abd70db1d0654c01cbe9f7093d66e0c83ade20738156cb7d0e
+    image: mcr.microsoft.com/mssql/server:2022-latest@sha256:c4369c38385eba011c10906dc8892425831275bb035d5ce69656da8e29de50d8
     restart: unless-stopped
     profiles:
       - azure
