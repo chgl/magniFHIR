@@ -19,6 +19,7 @@ jobs:
       packages: write
       pull-requests: write
       actions: read
+      security-events: write
     with:
       # explicitly lowercase the repo name
       image: "ghcr.io/chgl/magnifhir"
