@@ -12,13 +12,14 @@ permissions: read-all
 
 jobs:
   build:
-    uses: chgl/.github/.github/workflows/standard-build.yaml@1a7b14d1f494842e3a36f4028f865cc20805e542 # v1.5.40
+    uses: chgl/.github/.github/workflows/standard-build.yaml@bf8a522c605a2c530f45c2c55ca1484f08904203 # v1.6.0
     permissions:
       contents: read
       id-token: write
       packages: write
       pull-requests: write
       actions: read
+      security-events: write
     with:
       # explicitly lowercase the repo name
       image: "ghcr.io/chgl/magnifhir"
@@ -28,7 +29,7 @@ jobs:
       github-token: ${{ secrets.GITHUB_TOKEN }}
 
   lint:
-    uses: chgl/.github/.github/workflows/standard-lint.yaml@1a7b14d1f494842e3a36f4028f865cc20805e542 # v1.5.40
+    uses: chgl/.github/.github/workflows/standard-lint.yaml@bf8a522c605a2c530f45c2c55ca1484f08904203 # v1.6.0
     permissions:
       contents: read
       pull-requests: write
@@ -38,5 +39,7 @@ jobs:
     with:
       codeql-languages: '["csharp"]'
       enable-codeql: true
+      enable-validate-gradle-wrapper: false
+      enable-verify-base-image-signature: false
     secrets:
       github-token: ${{ secrets.GITHUB_TOKEN }}
