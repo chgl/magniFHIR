@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.8@sha256:e87caa74dcb7d46cd820352bfea12591f3dba3ddc4285e19c7dcd13359f7cefd
+# syntax=docker/dockerfile:1.9@sha256:fe40cf4e92cd0c467be2cfc30657a680ae2398318afd50b0c80585784c604f28
 FROM mcr.microsoft.com/dotnet/nightly/aspnet:7.0-jammy-chiseled@sha256:02e09bf8a723a8fcc313c65d9cf171bfde85e2beeeed67013a8e615ca84992fb AS runtime
 WORKDIR /opt/magnifhir
 EXPOSE 8080/tcp 8081/tcp
