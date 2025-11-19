@@ -1,6 +1,6 @@
 services:
   traefik:
-    image: docker.io/library/traefik:v2.11.5@sha256:8a09d14ac9a175e105166c7cadcadd01a1fd91c6fec9ce84897ca47859efca41
+    image: docker.io/library/traefik:v2.11.31@sha256:91ec852c76c2509984f6c1fddc99322b1a325f26dfdcc85706cb02db06980cb9
     restart: unless-stopped
     ipc: none
     security_opt:
@@ -65,7 +65,7 @@ services:
       - "traefik.http.routers.fhir.entrypoints=web"
 
   hapi-fhir-db:
-    image: index.docker.io/library/postgres:15.7@sha256:68b988a164c8bdf0752fa7a4ae2d4b34a058e21c6327e69f741c081a38e97254
+    image: index.docker.io/library/postgres:15.15@sha256:24d6c206bba8c0440bceb24a8d4bf642f60bf7aea94887051ea5761d29c22323
     restart: unless-stopped
     ipc: private
     security_opt:
@@ -105,7 +105,7 @@ services:
       - hapi-fhir-server
 
   l4h-fhir-db:
-    image: docker.io/library/postgres:14.12@sha256:f055b09e632d40c562d80e1078c21362d720d3c8c040f65edf6cb609229f09d3
+    image: docker.io/library/postgres:14.20@sha256:ca25035f7e6f74552655a1c5e4a9eb21f85e9d316f1f70371f790ef70095dd58
     restart: unless-stopped
     profiles:
       - l4h
@@ -204,7 +204,7 @@ services:
       ACCEPT_EULA: "Y"
 
   jaeger:
-    image: docker.io/jaegertracing/all-in-one:1.58@sha256:f015fb34e6742bb46b87c42cf83abfacfdd5dc39864a859a4ba942eb21c4b29c
+    image: docker.io/jaegertracing/all-in-one:1.60@sha256:4fd2d70fa347d6a47e79fcb06b1c177e6079f92cba88b083153d56263082135e
     restart: unless-stopped
     cap_drop:
       - ALL
