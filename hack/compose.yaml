@@ -65,7 +65,7 @@ services:
       - "traefik.http.routers.fhir.entrypoints=web"
 
   hapi-fhir-db:
-    image: index.docker.io/library/postgres:15.7@sha256:170ef27196b0b97d21a698b9d3aa2257a29e9fce4b5618f7282d7e6d0daded92
+    image: index.docker.io/library/postgres:15.7@sha256:68b988a164c8bdf0752fa7a4ae2d4b34a058e21c6327e69f741c081a38e97254
     restart: unless-stopped
     ipc: private
     security_opt:
