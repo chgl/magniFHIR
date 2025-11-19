@@ -105,7 +105,7 @@ services:
       - hapi-fhir-server
 
   l4h-fhir-db:
-    image: docker.io/library/postgres:14.12@sha256:21a1b037ebe0d3b7edefe4bc4352634883d4ba4fa7b7641bf86afa3219a47547
+    image: docker.io/library/postgres:14.12@sha256:f055b09e632d40c562d80e1078c21362d720d3c8c040f65edf6cb609229f09d3
     restart: unless-stopped
     profiles:
       - l4h
