@@ -123,7 +123,7 @@ services:
       POSTGRES_DB: fhir
 
   fhir-schematool:
-    image: ghcr.io/linuxforhealth/fhir-schematool:5.1.1@sha256:447a13f81d0b27a8a853ba5fdcce8b61283e55d241c59d20cee5a7c510f3bb3a
+    image: ghcr.io/linuxforhealth/fhir-schematool:5.1.1@sha256:f62cefee6ef63df3121c537ddee5843fc2b3747f70b7a04a16649d293597e1af
     restart: on-failure
     profiles:
       - l4h
