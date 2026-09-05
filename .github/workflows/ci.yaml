@@ -12,7 +12,7 @@ permissions: read-all
 
 jobs:
   build:
-    uses: chgl/.github/.github/workflows/standard-build.yaml@89b6f442c3120f78e8dfdb90143ba80f281641a2 # v1.11.5
+    uses: chgl/.github/.github/workflows/standard-build.yaml@e2a6e5d0b006bdb4ebba213fdd51eecfbb23d41e # v1.11.54
     permissions:
       contents: read
       id-token: write
@@ -29,7 +29,7 @@ jobs:
       github-token: ${{ secrets.GITHUB_TOKEN }}
 
   lint:
-    uses: chgl/.github/.github/workflows/standard-lint.yaml@89b6f442c3120f78e8dfdb90143ba80f281641a2 # v1.11.5
+    uses: chgl/.github/.github/workflows/standard-lint.yaml@e2a6e5d0b006bdb4ebba213fdd51eecfbb23d41e # v1.11.54
     permissions:
       contents: read
       pull-requests: write
