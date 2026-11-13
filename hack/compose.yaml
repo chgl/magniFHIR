@@ -1,6 +1,6 @@
 services:
   traefik:
-    image: docker.io/library/traefik:v2.11.31@sha256:91ec852c76c2509984f6c1fddc99322b1a325f26dfdcc85706cb02db06980cb9
+    image: docker.io/library/traefik:v2.11.63@sha256:4c29081716cda7f33a59a15c07fcc53248cab15b5caaf429dd9c99c7c306710a
     restart: unless-stopped
     ipc: none
     security_opt:
@@ -65,7 +65,7 @@ services:
       - "traefik.http.routers.fhir.entrypoints=web"
 
   hapi-fhir-db:
-    image: index.docker.io/library/postgres:15.15@sha256:24d6c206bba8c0440bceb24a8d4bf642f60bf7aea94887051ea5761d29c22323
+    image: index.docker.io/library/postgres:15.20@sha256:ad51f1a9aec85898aff1d1702ac361039286460de92d25610c85d76950f5d212
     restart: unless-stopped
     ipc: private
     security_opt:
@@ -105,7 +105,7 @@ services:
       - hapi-fhir-server
 
   l4h-fhir-db:
-    image: docker.io/library/postgres:14.20@sha256:ca25035f7e6f74552655a1c5e4a9eb21f85e9d316f1f70371f790ef70095dd58
+    image: docker.io/library/postgres:14.25@sha256:9c8a7df7224219e4fa32bb93f4dea665c5b3f322cb443a849bd92eec79af8b81
     restart: unless-stopped
     profiles:
       - l4h
